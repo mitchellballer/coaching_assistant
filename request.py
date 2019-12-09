@@ -1,9 +1,8 @@
 import requests
+import json
+
 from requests.exceptions import HTTPError
 
-
-
-#requests' Response instance evaluates to True if status code is between 200 and 400
 
 try:
     response = requests.get('https://api.github.com')
@@ -17,3 +16,9 @@ except Exception as err:
     print(f'Other error occurred: {err}')
 else:
     print('Success!')
+
+#response body, stored in dictionary
+payload = json.loads(response.content)
+
+#headers, stored in dictionary
+headers = json.loads(response.headers)
