@@ -1,8 +1,10 @@
 import requests
 import json
+import properties
 
 from requests.exceptions import HTTPError
 
+print (properties.token)
 
 try:
     response = requests.get('https://api.github.com')
