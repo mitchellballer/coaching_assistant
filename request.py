@@ -4,10 +4,14 @@ import properties
 
 from requests.exceptions import HTTPError
 
-print (properties.token)
-
+url = 'https://www.strava.com/api/v3/athlete'
+data = {'before': '56','after': '56', 'page': '1', }
+cert = "Bearer: %s" % (properties.token)
+print (cert)
 try:
-    response = requests.get('https://api.github.com')
+    response = requests.get(url, headers = {"Authorization": cert})
+    #response = requests.get(url, auth = ('Authorization', cert))
+    #response = requests.get('https://api.github.com')
     #response = requests.get('https://api.github.com/invalid')
 
     #raise Exception if response not successful
@@ -20,7 +24,7 @@ else:
     print('Success!')
 
 #response body, stored in dictionary
-payload = json.loads(response.content)
+#payload = json.loads(response.content)
 
 #headers, stored in dictionary
-headers = response.headers
+#headers = response.headers
