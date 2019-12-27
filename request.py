@@ -23,4 +23,4 @@ else:
 payload = json.loads(response.content)
 
 #headers, stored in dictionary
-headers = json.loads(response.headers)
+headers = response.headers
