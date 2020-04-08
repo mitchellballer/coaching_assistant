@@ -3,11 +3,13 @@ import json
 import properties
 
 from requests.exceptions import HTTPError
+from requests_oauthlib import OAuth2Session
 
-url = 'https://www.strava.com/api/v3/athlete'
+""" url = 'https://www.strava.com/api/v3/athlete'
 data = {'before': '56','after': '56', 'page': '1', }
 cert = "Bearer: %s" % (properties.token)
 print (cert)
+
 try:
     response = requests.get(url, headers = {"Authorization": cert})
     #response = requests.get(url, auth = ('Authorization', cert))
@@ -16,15 +18,42 @@ try:
 
     #raise Exception if response not successful
     response.raise_for_status()
+
 except HTTPError as http_err:
-    print(f'HTTP error occurred: {http_err}')
+    print('HTTP error occurred: {http_err}', http_err)
 except Exception as err:
-    print(f'Other error occurred: {err}')
+    print('Other error occurred: {err}')
 else:
-    print('Success!')
+    print('Success!') """
 
 #response body, stored in dictionary
 #payload = json.loads(response.content)
 
 #headers, stored in dictionary
 #headers = response.headers
+
+#params = {'client_id': properties.client_id, 'response_type': 'code', 'redirect_uri': redirect_uri}
+
+client_id = properties.client_id
+client_secret = properties.client_secret
+redirect_uri = "http://localhost/exchange_token&approval_prompt=force&scope=read"
+scope = "read"
+auth_url = 'https://www.strava.com/oauth/authorize'
+
+oauth = OAuth2Session(client_id, redirect_uri=redirect_uri)
+authorization_url, state = oauth.authorization_url(auth_url)
+
+print 'Please go to %s and authorize access.' % authorization_url
+authorization_response = raw_input('Enter the full callback URL')
+
+print authorization_url
+
+"""
+oauth.authorization_url returns this url:
+https://www.strava.com/oauth/authorize?response_type=code&client_id=41250&redirect_uri=http%3A%2F%2Flocalhost%2Fexchange_token%26approval_prompt%3Dforce%26scope%3Dread&state=lMpp5o30GyPKst2TZ43HtZGvTAl0bE 
+
+However, that messed up redirect_uri doesn't work. If I substitute the non messed up uri as below, it correctly routes me in the browser.
+https://www.strava.com/oauth/authorize?response_type=code&client_id=41250&redirect_uri=http://localhost/exchange_token&approval_prompt=force&scope=read 
+
+Might need to go a little more manual with the url creation here. not sure what the down stream negative effects of this will be...
+"""
