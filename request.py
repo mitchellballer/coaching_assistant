@@ -2,6 +2,8 @@ import requests
 import json
 import properties
 
+from urlparse import urlparse, parse_qs
+
 from requests.exceptions import HTTPError
 from requests_oauthlib import OAuth2Session
 
@@ -41,6 +43,7 @@ scope = 'read'
 kwargs = {'approval_prompt': 'force'}
 approval_prompt = 'force'
 auth_url = 'https://www.strava.com/oauth/authorize'
+token_url = 'https://www.strava.com/oauth/token'
 
 oauth = OAuth2Session(client_id=client_id, redirect_uri=redirect_uri, scope=[scope])
 authorization_url, state = oauth.authorization_url(auth_url)
@@ -52,3 +55,17 @@ authorization_url = authorization_url + '&approval_prompt=force'
 print 'Please go to %s and authorize access.' % authorization_url
 authorization_response = raw_input('Enter the full callback URL: ')
 
+#take response, parse out code if we got one
+o = urlparse(authorization_response)
+query = parse_qs(o.query)
+if 'code' in query:
+    authorization_code = query['code']
+else:
+    print "No authorization code"
+
+#perform token exchange using auth code
+payload = {'client_id':properties.client_id, 'client_secret': properties.client_secret, 'code': authorization_code, 'grant_type': 'authorization_code'}
+r = requests.post(token_url, data=payload)
+
+if r.status_code == 200:
+    print r.json()
