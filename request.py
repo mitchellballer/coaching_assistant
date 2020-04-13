@@ -2,7 +2,7 @@ import requests
 import json
 import properties
 
-from urlparse import urlparse, parse_qs
+from urllib.parse import urlparse, parse_qs
 
 from requests.exceptions import HTTPError
 from requests_oauthlib import OAuth2Session
@@ -52,8 +52,8 @@ authorization_url, state = oauth.authorization_url(auth_url)
 #Authorization url still messes with symbols in redirect_uri but it seems to be functional
 authorization_url = authorization_url + '&approval_prompt=force'
 
-print 'Please go to %s and authorize access.' % authorization_url
-authorization_response = raw_input('Enter the full callback URL: ')
+print ("Please go to " + authorization_url + " and authorize access.")
+authorization_response = input('Enter the full callback URL: ')
 
 #take response, parse out code if we got one
 o = urlparse(authorization_response)
@@ -61,11 +61,11 @@ query = parse_qs(o.query)
 if 'code' in query:
     authorization_code = query['code']
 else:
-    print "No authorization code"
+    print ("No authorization code")
 
 #perform token exchange using auth code
 payload = {'client_id':properties.client_id, 'client_secret': properties.client_secret, 'code': authorization_code, 'grant_type': 'authorization_code'}
 r = requests.post(token_url, data=payload)
 
 if r.status_code == 200:
-    print r.json()
+    print (r.json())
