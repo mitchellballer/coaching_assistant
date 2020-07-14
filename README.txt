@@ -6,8 +6,14 @@ a calendar with weekly milage, recent workout highlights, comments etc.
 
 prerequisites:
 -python module 'request'
--properties.py with:
-    token = '[API ACCESS TOKEN]'
-    my_athlete_id = '[ATHLETE ID]'
-    client_id = '[CLIENT ID]'
-    client_secret = '[CLIENT SECRET]'
+-config.properties in same directory with:
+    [TOKEN]
+    bearer_token = 
+    bearer_token_expiration = 0
+
+    [CLIENT]
+    client_id = [your client id]
+    client_secret = [your client secret]
+
+    [ATHLETE]
+    my_athlete_id = [your athlete id]

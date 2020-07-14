@@ -54,8 +54,8 @@ if bearer_token_expiration == '':
 else:
     bearer_token_expiration = int(bearer_token_expiration)
 
-client_id = properties.client_id
-client_secret = properties.client_secret
+client_id = config['CLIENT']['client_id']
+client_secret = config['CLIENT']['client_secret']
 redirect_uri = 'http://localhost/exchange_token'
 scope = 'activity:read'
 kwargs = {'approval_prompt': 'force'}
@@ -87,7 +87,7 @@ if bearer_token == '' or bearer_token_expiration < curr_time:
         print ("No authorization code")
 
     #perform token exchange using auth code
-    payload = {'client_id':properties.client_id, 'client_secret': properties.client_secret, 'code': authorization_code, 'grant_type': 'authorization_code'}
+    payload = {'client_id':client_id, 'client_secret': client_secret, 'code': authorization_code, 'grant_type': 'authorization_code'}
     r = requests.post(token_url, data=payload)
 
     if r.status_code == 200:
