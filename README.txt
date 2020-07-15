@@ -10,6 +10,7 @@ prerequisites:
     [TOKEN]
     bearer_token = 
     bearer_token_expiration = 0
+    refresh_token = 
 
     [CLIENT]
     client_id = [your client id]
