@@ -22,7 +22,7 @@ def register():
         elif not password:
             error = 'Password is required.'
         elif db.execute(
-            'SELECT id FROM user WHERE username = ?', (username,)
+            'SELECT athlete_id FROM athlete WHERE username = ?', (username,)
         ).fetchone() is not None:
             error = 'User {} is already registered.'.format(username)
         
@@ -55,7 +55,7 @@ def login():
 
         if error is None:
             session.clear()
-            session['user_id'] = athlete['id']
+            session['athlete_id'] = athlete['athlete_id']
             return redirect(url_for('index'))
         
         flash(error)
