@@ -2,6 +2,7 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for
 )
 from werkzeug.exceptions import abort
+import datetime
 
 from flaskr.auth import login_required
 from flaskr.db import get_db
@@ -26,19 +27,22 @@ def create():
     if request.method == 'POST':
         title = request.form['title']
         description = request.form['description']
+        start_date = request.form['start_date']
         error = None
 
         if not title:
             error = 'Title is required'
-        
+        #if they don't provide a date, use the current datetime
+        if not start_date:
+            start_date = datetime.datetime.now()
         if error is not None:
             flash(error)
         else:
             db = get_db()
             db.execute(
-                'INSERT INTO activity (title, desription, athlete_id)'
-                ' VALUES (?, ?, ?)',
-                (title, description, g.user['id'])
+                'INSERT INTO activity (title, description, start_date, athlete_id)'
+                ' VALUES (?, ?, ?, ?)',
+                (title, description, start_date, g.athlete['id'])
             )
             db.commit()
             return redirect(url_for('activity.index'))

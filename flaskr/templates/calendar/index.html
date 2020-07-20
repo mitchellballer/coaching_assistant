@@ -16,7 +16,7 @@
                     <div class="about">by {{ activity['username'] }} on {{ activity['start_date'].strftime('%Y-%m-%d') }}</div>
                 </div>
                 {% if g.athlete['id'] == activity['athlete_id'] %}
-                    <a class="action" href="{{ url_for('activity.update', id=activity['id']) }}">Edit. This also won't work yet</a>
+                    
                 {% endif %}
             </header>
             <p class="body">{{ activity['description'] }}</p>

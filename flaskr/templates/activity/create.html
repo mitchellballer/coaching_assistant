@@ -8,6 +8,8 @@
   <form method="post">
     <label for="title">Title</label>
     <input name="title" id="title" value="{{ request.form['title'] }}" required>
+    <label for="date">Date</label>
+    <input name="start_date" id="date" value="{{ request.form['start_date'] }}">
     <label for="description">Description</label>
     <textarea name="description" id="description">{{ request.form['description'] }}</textarea>
     <input type="submit" value="Save">
