@@ -83,6 +83,8 @@ elif bearer_token_expiration < curr_time:
         config['TOKEN']['bearer_token'] = bearer_token
         config['TOKEN']['bearer_token_expiration'] = str(bearer_token_expiration)
         config['TOKEN']['refresh_token'] = refresh_token
+        with open(config_file, 'w') as new_config:
+            config.write(new_config)
 #let's get activities from the past week
 #url requires epoch time
 before= time.time()

@@ -37,4 +37,10 @@ def create_app(test_config=None):
     #import and register our authentication blueprint
     from . import auth
     app.register_blueprint(auth.bp)
+
+ #   #import and register our activity blueprint
+    from . import calendar
+    app.register_blueprint(calendar.bp)
+    app.add_url_rule('/', endpoint='index')
+
     return app
