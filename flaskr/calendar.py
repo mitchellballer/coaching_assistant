@@ -14,7 +14,32 @@ def index():
     db = get_db()
     activities = db.execute(
         'SELECT p.id, title, description, start_date, athlete_id, username'
-        ' FROM activity p JOIN athlete u ON p.athlete_id = u.athlete_id'
+        ' FROM activity p JOIN athlete u ON p.athlete_id = u.id'
         ' ORDER BY start_date DESC'
     ).fetchall()
     return render_template('calendar/index.html', activities=activities)
+
+#create view. Must be logged in to view
+@bp.route('/create', methods=('GET', 'POST'))
+@login_required
+def create():
+    if request.method == 'POST':
+        title = request.form['title']
+        description = request.form['description']
+        error = None
+
+        if not title:
+            error = 'Title is required'
+        
+        if error is not None:
+            flash(error)
+        else:
+            db = get_db()
+            db.execute(
+                'INSERT INTO activity (title, desription, athlete_id)'
+                ' VALUES (?, ?, ?)',
+                (title, description, g.user['id'])
+            )
+            db.commit()
+            return redirect(url_for('activity.index'))
+    return render_template('activity/create.html')

@@ -22,7 +22,7 @@ def register():
         elif not password:
             error = 'Password is required.'
         elif db.execute(
-            'SELECT athlete_id FROM athlete WHERE username = ?', (username,)
+            'SELECT id FROM athlete WHERE username = ?', (username,)
         ).fetchone() is not None:
             error = 'User {} is already registered.'.format(username)
         
@@ -55,7 +55,7 @@ def login():
 
         if error is None:
             session.clear()
-            session['athlete_id'] = athlete['athlete_id']
+            session['user_id'] = athlete['id']
             return redirect(url_for('index'))
         
         flash(error)
@@ -63,13 +63,13 @@ def login():
 
 @bp.before_app_request
 def load_logged_in_athlete():
-    athlete_id = session.get('athlete_id')
+    athlete_id = session.get('user_id')
 
     if athlete_id is None:
         g.athlete = None
     else:
         g.athlete = get_db().execute(
-            'SELECT * FROM athlete WHERE athlete_id = ?', (athlete_id,)
+            'SELECT * FROM athlete WHERE id = ?', (athlete_id,)
         ).fetchone()
 
 @bp.route('/logout')
