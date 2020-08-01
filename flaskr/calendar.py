@@ -28,6 +28,8 @@ def create():
         title = request.form['title']
         description = request.form['description']
         start_date = request.form['start_date']
+        distance = request.form['distance']
+        duration = request.form['duration']
         error = None
 
         if not title:
@@ -40,10 +42,10 @@ def create():
         else:
             db = get_db()
             db.execute(
-                'INSERT INTO activity (title, description, start_date, athlete_id)'
-                ' VALUES (?, ?, ?, ?)',
-                (title, description, start_date, g.athlete['id'])
+                'INSERT INTO activity (title, description, start_date, athlete_id, distance, duration)'
+                ' VALUES (?, ?, ?, ?, ?, ?)',
+                (title, description, start_date, g.athlete['id'], distance, duration)
             )
             db.commit()
-            return redirect(url_for('activity.index'))
+            return redirect(url_for('calendar.index'))
     return render_template('activity/create.html')

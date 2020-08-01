@@ -3,7 +3,7 @@
 {% block header %}
     <h1>{% block title %}Activities{% endblock %}</h1>
     {% if g.athlete %}
-        <a class="action" href="{{ url_for('activity.create') }}">New. this won't work yet</a>
+        <a class="action" href="{{ url_for('activity.create') }}">New Manual Activity</a>
     {% endif %}
 {% endblock %}
 
@@ -14,6 +14,7 @@
                 <div>
                     <h1>{{ activity['title'] }}</h1>
                     <div class="about">by {{ activity['username'] }} on {{ activity['start_date'].strftime('%Y-%m-%d') }}</div>
+                    <div class="about">{{ activity['distance'] }} miles in {{ activity['duration'] }} seconds</div>
                 </div>
                 {% if g.athlete['id'] == activity['athlete_id'] %}
                     

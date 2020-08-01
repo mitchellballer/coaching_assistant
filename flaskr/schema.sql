@@ -9,9 +9,11 @@ CREATE TABLE athlete (
 
 CREATE TABLE activity (
   id INTEGER PRIMARY KEY,
-  athlete_id INTEGER NOT NULL,
   start_date TIMESTAMP NOT NULL,
   title TEXT NOT NULL,
   description TEXT NOT NULL,
-  FOREIGN KEY (athlete_id) REFERENCES athlete (athlete_id)
+  distance DOUBLE,
+  duration DOUBLE,
+  athlete_id INTEGER NOT NULL,
+  FOREIGN KEY(athlete_id) REFERENCES athlete(id)
 );
