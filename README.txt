@@ -4,6 +4,9 @@ Coaches will be able to invite athletes to their 'group' or 'team'. After authen
 are accepted, the coach will be able to see a summary of that athletes training on a dashboard. Ideally
 a calendar with weekly milage, recent workout highlights, comments etc.
 
+export FLASK_APP=__init__.py
+
+Test user: mitchell, password
 prerequisites:
 -python module 'request'
 -config.properties in same directory with:

@@ -14,7 +14,7 @@ bp = Blueprint('calendar', __name__)
 def index():
     db = get_db()
     activities = db.execute(
-        'SELECT p.id, title, description, start_date, athlete_id, username'
+        'SELECT p.id, title, description, start_date, athlete_id, username, distance, duration'
         ' FROM activity p JOIN athlete u ON p.athlete_id = u.id'
         ' ORDER BY start_date DESC'
     ).fetchall()
@@ -31,12 +31,22 @@ def create():
         distance = request.form['distance']
         duration = request.form['duration']
         error = None
+        print('hello world')
 
         if not title:
             error = 'Title is required'
         #if they don't provide a date, use the current datetime
         if not start_date:
             start_date = datetime.datetime.now()
+        if not distance:
+            print('no distance')
+        else:
+            print(f'distance: {distance}')
+        if not duration:
+            print('no duration')
+        else:
+            print(f'duration: {duration}')
+
         if error is not None:
             flash(error)
         else:
@@ -47,5 +57,9 @@ def create():
                 (title, description, start_date, g.athlete['id'], distance, duration)
             )
             db.commit()
+            hello = db.execute(
+                'SELECT * from activity;')
+            #we can see the distance and duration are loaded into the database.... so why are they still not appearing in the calendar?
+            print(tuple(hello.fetchone()))
             return redirect(url_for('calendar.index'))
     return render_template('activity/create.html')
