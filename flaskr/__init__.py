@@ -47,4 +47,7 @@ def create_app(test_config=None):
     from . import activity
     app.register_blueprint(activity.bp)
 
+    from . import profile
+    app.register_blueprint(profile.bp)
+
     return app
