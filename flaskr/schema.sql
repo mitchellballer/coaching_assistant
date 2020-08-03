@@ -4,7 +4,12 @@ DROP TABLE IF EXISTS activity;
 CREATE TABLE athlete (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   username TEXT UNIQUE NOT NULL,
-  password TEXT NOT NULL
+  password TEXT NOT NULL,
+  connected_to_strava BOOLEAN,
+  strava_bearer_token TEXT,
+  strava_bearer_token_expiration INTEGER,
+  strava_refresh_token TEXT,
+  strava_athlete_id INTEGER
 );
 
 CREATE TABLE activity (

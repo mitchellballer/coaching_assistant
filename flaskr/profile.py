@@ -12,3 +12,11 @@ bp = Blueprint('profile', __name__)
 @login_required
 def index():
     return render_template('profile/index.html')
+
+@bp.route('/connect')
+@login_required
+def connect():
+    #put code to connect to garmin here
+    print('connecting to strava')
+    print('redirecting to profile page')
+    return redirect(url_for('profile.index'))

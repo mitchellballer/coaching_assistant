@@ -3,4 +3,14 @@
 {% block content %}
 This is your profile page. Here you will find info about your athlete profile,
 settings and strava connection!
+
+<ul>Profile info
+    <li>username: {{g.athlete['username']}}</li>
+    {%if g.athlete['connected_to_strava'] %}
+    <li>connected to strava!</li>
+    {% else %}
+    <li><a href="{{ url_for('profile.connect') }}"><span>connect to strava</span></a></li>
+    {% endif %}
+</ul>
+
 {% endblock %}
