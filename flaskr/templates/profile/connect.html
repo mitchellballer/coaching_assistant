@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Connection information{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+We need your strava ID before we can connect.
+<form method="post">
+    <label for="strava_id">My strava ID:</labal>
+    <input name="strava_id" id="strava_id" value="{{ request.form['strava_id'] }}">
+</form>
+{% endblock %}

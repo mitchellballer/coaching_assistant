@@ -29,8 +29,8 @@ def register():
         #add them to the database
         if error is None:
             db.execute(
-                'INSERT INTO athlete (username, password) VALUES (?, ?)',
-                (username, generate_password_hash(password))
+                'INSERT INTO athlete (username, password, connected_to_strava) VALUES (?, ?, ?)',
+                (username, generate_password_hash(password), False)
             )
             db.commit()
             return redirect(url_for('auth.login'))
