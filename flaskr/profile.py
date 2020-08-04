@@ -9,6 +9,7 @@ from flaskr.db import get_db
 import properties
 import configparser
 import requests
+import time
 from urllib.parse import urlparse, parse_qs
 
 from requests_oauthlib import OAuth2Session
@@ -56,7 +57,6 @@ def connect():
     
     #put code to connect to strava here
     print('connecting to strava')
-    print_current_state()
     
     #TODO get this redirecting to a page where we can use without the command line
     redirect_uri = 'http://localhost:5000/exchange_token'
@@ -91,11 +91,46 @@ def connect():
             token_expiration = r.json()['expires_at']
             refresh_token = r.json()['refresh_token']
             update_athlete_tokens(bearer_token, token_expiration, refresh_token, g.athlete['id'])
+    
+    #if we already have a short term token but it's expired, we should refresh
+    elif token_expiration < time.time():
+        print('refresh short term token')
+    
+    #get the most recent activity and add it to the database 
+    parameters = {'per_page':1, 'page':1}
+    header = {'Authorization':'Bearer ' + bearer_token}
+    base = 'https://www.strava.com/api/v3/athlete/activities'
+    activity = requests.get(base, headers=header,params=parameters).json()[0]
 
-    print_current_state()
+    print(activity['name'])
+    print(activity['start_date'])
+    save_activity(activity, g.athlete['id'])
 
     print('redirecting to profile page')
     return redirect(url_for('profile.index'))
+
+#save given activity to database for given athlete
+#input is a single activity in json form provided by strava
+def save_activity(activity, athlete_id):
+    title = activity['name']
+    #TODO fix this so our timestamp/datetimes are compatible 
+    #this is a terrible hack solution
+    #strava gives us datetime in format: 2018-02-20T18:02:13Z
+    #flask at somepoint splits this into two strings by a string separating date from time and we can't have a z at the end...
+    start = activity['start_date'].replace('T', ' ').replace('Z','')
+    description = 'sample description'#activity['description']
+    distance = activity['distance']
+    duration = activity['elapsed_time']
+    #TODO might need to add strava_id or something to activity database so we don't add duplicates
+    db = get_db()
+    db.execute(
+        'INSERT INTO activity (start_date, title, description, distance, duration, athlete_id)'
+        ' VALUES (?, ?, ?, ?, ?, ?)',
+        (start, title, description, distance, duration, athlete_id)
+    )
+    db.commit()
+
+
 
 #function that just prints current info about our athlete, state of tokens etc.
 def print_current_state():
