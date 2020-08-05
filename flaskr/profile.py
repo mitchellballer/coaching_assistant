@@ -28,6 +28,7 @@ def connect():
 
     client_id, client_secret, athlete_id, bearer_token, token_expiration, refresh_token, strava_id = check_prerequisites()
     
+    """
     #If they're submitting their strava ID now, make sure it seems correct then add to database
     if request.method == 'POST':
         strava_id = request.form['strava_id']
@@ -55,11 +56,12 @@ def connect():
     if strava_id == None:
         return render_template('profile/connect.html')
     
+    """
     #put code to connect to strava here
     print('connecting to strava')
     
     #TODO get this redirecting to a page where we can use without the command line
-    redirect_uri = 'http://localhost:5000/exchange_token'
+    redirect_uri = 'http://localhost:5000/'
     auth_url = 'https://www.strava.com/oauth/authorize'
     token_url = 'https://www.strava.com/oauth/token'
     scope = 'activity:read'
@@ -90,8 +92,8 @@ def connect():
             bearer_token = r.json()['access_token']
             token_expiration = r.json()['expires_at']
             refresh_token = r.json()['refresh_token']
-            update_athlete_tokens(bearer_token, token_expiration, refresh_token, g.athlete['id'])
-    
+            update_athlete_tokens(bearer_token, token_expiration, refresh_token, True, g.athlete['id'])
+
     #if we already have a short term token but it's expired, we should refresh
     elif token_expiration < time.time():
         print('refresh short term token')
@@ -102,7 +104,7 @@ def connect():
             bearer_token = r.json()['access_token']
             token_expiration = r.json()['expires_at']
             refresh_token = r.json()['refresh_token']
-            update_athlete_tokens(bearer_token,token_expiration,refresh_token,g.athlete['id'])
+            update_athlete_tokens(bearer_token,token_expiration,refresh_token, True, g.athlete['id'])
 
     #get the most recent activity and add it to the database 
     parameters = {'per_page':1, 'page':1}
@@ -148,13 +150,13 @@ def print_current_state():
     print(f"strava athlete id: {g.athlete['strava_athlete_id']}")
 
 
-def update_athlete_tokens(bearer_token, token_expiration, refresh_token, athlete_id):
+def update_athlete_tokens(bearer_token, token_expiration, refresh_token, connected, athlete_id):
     db = get_db()
     db.execute(
         'UPDATE athlete'
-        ' SET strava_bearer_token = ?, strava_bearer_token_expiration = ?, strava_refresh_token = ?'
+        ' SET strava_bearer_token = ?, strava_bearer_token_expiration = ?, strava_refresh_token = ?, connected_to_strava = ?'
         ' WHERE id = ?',
-        (bearer_token, token_expiration, refresh_token, athlete_id)
+        (bearer_token, token_expiration, refresh_token, connected, athlete_id)
     )
     db.commit()
 
