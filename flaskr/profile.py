@@ -95,15 +95,21 @@ def connect():
     #if we already have a short term token but it's expired, we should refresh
     elif token_expiration < time.time():
         print('refresh short term token')
-    
+        payload = {'client_id':client_id,'client_secret':client_secret,'grant_type':'refresh_token','refresh_token':refresh_token}
+        r = requests.post(token_url,data=payload)
+        #successful response: {"token_type":"Bearer","access_token":"asdf1234","expires_at":123445,"expires_in":21600,"refresh_token":"asdf1234"}
+        if r.status_code == 200:
+            bearer_token = r.json()['access_token']
+            token_expiration = r.json()['expires_at']
+            refresh_token = r.json()['refresh_token']
+            update_athlete_tokens(bearer_token,token_expiration,refresh_token,g.athlete['id'])
+
     #get the most recent activity and add it to the database 
     parameters = {'per_page':1, 'page':1}
     header = {'Authorization':'Bearer ' + bearer_token}
     base = 'https://www.strava.com/api/v3/athlete/activities'
     activity = requests.get(base, headers=header,params=parameters).json()[0]
 
-    print(activity['name'])
-    print(activity['start_date'])
     save_activity(activity, g.athlete['id'])
 
     print('redirecting to profile page')
