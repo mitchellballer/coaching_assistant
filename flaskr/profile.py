@@ -21,6 +21,12 @@ bp = Blueprint('profile', __name__)
 def index():
     return render_template('profile/index.html')
 
+@bp.route('/authorized/')
+def authorized():
+    #did we get any useful information from this url?
+    print("hello world")
+    return redirect(url_for('profile.index'))
+
 @bp.route('/connect', methods=('GET','POST'))
 @login_required
 def connect():
@@ -61,7 +67,7 @@ def connect():
     print('connecting to strava')
     
     #TODO get this redirecting to a page where we can use without the command line
-    redirect_uri = 'http://localhost:5000/'
+    redirect_uri = 'http://localhost:5000/exchange_token'
     auth_url = 'https://www.strava.com/oauth/authorize'
     token_url = 'https://www.strava.com/oauth/token'
     scope = 'activity:read'
@@ -71,6 +77,7 @@ def connect():
         oauth = OAuth2Session(client_id=client_id, redirect_uri=redirect_uri, scope=[scope])
         authorization_url, state = oauth.authorization_url(auth_url)
         authorization_url = authorization_url + '&approval_prompt=force'
+        #return redirect(authorization_url)
         print("Please go to "+authorization_url+" and authorize access.")
         authorization_response = input('Enter the full callback URL: ')
 
@@ -96,26 +103,36 @@ def connect():
 
     #if we already have a short term token but it's expired, we should refresh
     elif token_expiration < time.time():
-        print('refresh short term token')
-        payload = {'client_id':client_id,'client_secret':client_secret,'grant_type':'refresh_token','refresh_token':refresh_token}
-        r = requests.post(token_url,data=payload)
-        #successful response: {"token_type":"Bearer","access_token":"asdf1234","expires_at":123445,"expires_in":21600,"refresh_token":"asdf1234"}
-        if r.status_code == 200:
-            bearer_token = r.json()['access_token']
-            token_expiration = r.json()['expires_at']
-            refresh_token = r.json()['refresh_token']
-            update_athlete_tokens(bearer_token,token_expiration,refresh_token, True, g.athlete['id'])
-
-    #get the most recent activity and add it to the database 
-    parameters = {'per_page':1, 'page':1}
-    header = {'Authorization':'Bearer ' + bearer_token}
-    base = 'https://www.strava.com/api/v3/athlete/activities'
-    activity = requests.get(base, headers=header,params=parameters).json()[0]
-
-    save_activity(activity, g.athlete['id'])
+        refresh_existing_token(client_id,client_secret,refresh_token)
 
     print('redirecting to profile page')
     return redirect(url_for('profile.index'))
+
+#function to refresh token
+#assumes we've connected to strava in the past and we have a valid refresh token
+def refresh_existing_token(client_id, client_secret, refresh_token):
+    print("refreshing token")
+    token_url = 'https://www.strava.com/oauth/token'
+    payload = {'client_id':client_id,'client_secret':client_secret,'grant_type':'refresh_token','refresh_token':refresh_token}
+    r = requests.post(token_url,data=payload)
+    if r.status_code == 200:
+        bearer_token = r.json()['access_token']
+        token_expiration = r.json()['expires_at']
+        refresh_token = r.json()['refresh_token']
+        update_athlete_tokens(bearer_token,token_expiration,refresh_token, True, g.athlete['id'])
+        print("token refreshed")
+    else:
+        print(f"Something went wrong. Response: {r.status_code}")
+
+#function to check if the user has a valid token
+def has_valid_token():
+    if g.athlete['connected_to_strava'] != 1:
+        print(g.athlete['connected_to_strava'])
+        return False
+    if g.athlete['strava_bearer_token_expiration'] > time.time():
+        return True
+    else:
+        return False
 
 #save given activity to database for given athlete
 #input is a single activity in json form provided by strava
@@ -159,6 +176,33 @@ def update_athlete_tokens(bearer_token, token_expiration, refresh_token, connect
         (bearer_token, token_expiration, refresh_token, connected, athlete_id)
     )
     db.commit()
+
+@bp.route("/pull_activity/", methods=['POST'])
+def hello_world():
+    client_id, client_secret, x, y, z, refresh_token, a = check_prerequisites()
+
+    if g.athlete['connected_to_strava'] != 1:
+        print(g.athlete['connected_to_strava'])
+        flash("you must be connected to strava")
+        print(g.athlete['connected_to_strava'])
+    elif not has_valid_token():
+        print("refreshing token")
+        refresh_existing_token(client_id, client_secret, refresh_token)
+
+    if has_valid_token():
+        bearer_token = g.athlete['strava_bearer_token']
+        #get the most recent activity and add it to the database 
+        parameters = {'per_page':1, 'page':1}
+        header = {'Authorization':'Bearer ' + bearer_token}
+        base = 'https://www.strava.com/api/v3/athlete/activities'
+        activity = requests.get(base, headers=header,params=parameters).json()[0]
+        save_activity(activity, g.athlete['id'])
+        flash("Activity Pulled!")
+    else:
+        print(g.athlete['connected_to_strava'])
+        flash("You must be connected to strava")
+    return render_template('profile/index.html')
+
 
 def check_prerequisites():
     #load client properties from config.properties

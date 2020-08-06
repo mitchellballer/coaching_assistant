@@ -11,6 +11,6 @@ settings and strava connection!
     {% else %}
     <li><a href="{{ url_for('profile.connect') }}"><span>connect to strava</span></a></li>
     {% endif %}
-</ul>
-
+    <li><form action="/pull_activity/" method="post"><button type="submit">Pull an Activity</button></form></li>
+    </ul>
 {% endblock %}
