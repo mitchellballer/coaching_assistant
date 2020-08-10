@@ -77,7 +77,8 @@ def connect():
         oauth = OAuth2Session(client_id=client_id, redirect_uri=redirect_uri, scope=[scope])
         authorization_url, state = oauth.authorization_url(auth_url)
         authorization_url = authorization_url + '&approval_prompt=force'
-        #return redirect(authorization_url)
+        return redirect(authorization_url)
+        """
         print("Please go to "+authorization_url+" and authorize access.")
         authorization_response = input('Enter the full callback URL: ')
 
@@ -100,12 +101,46 @@ def connect():
             token_expiration = r.json()['expires_at']
             refresh_token = r.json()['refresh_token']
             update_athlete_tokens(bearer_token, token_expiration, refresh_token, True, g.athlete['id'])
-
+        """
     #if we already have a short term token but it's expired, we should refresh
     elif token_expiration < time.time():
         refresh_existing_token(client_id,client_secret,refresh_token)
 
     print('redirecting to profile page')
+    return redirect(url_for('profile.index'))
+
+@bp.route('/exchange_token', methods=('GET','POST'))
+def exchange_token():
+    print("starting exchange token function")
+    token_url = 'https://www.strava.com/oauth/token'
+    #TODO: a lot of this should be outsourced to it's own class. Call it authorization or token functions or something
+    #All of this needs to be cleaned up
+    client_id, client_secret, athlete_id, bearer_token, token_expiration, refresh_token, strava_id = check_prerequisites()
+    if request.method == 'GET':
+        authorization_response = request.url
+        o = urlparse(authorization_response)
+        query = parse_qs(o.query)
+        if 'code' in query:
+            authorization_code = query['code']
+        else:
+            print("No authorization code")
+        
+        #perform token exchange
+        payload = {'client_id':client_id, 'client_secret': client_secret, 'code': authorization_code, 'grant_type': 'authorization_code'}
+        r = requests.post(token_url, data=payload)
+
+        if r.status_code == 200:
+            bearer_token = r.json()['access_token']
+            token_expiration = r.json()['expires_at']
+            refresh_token = r.json()['refresh_token']
+            update_athlete_tokens(bearer_token, token_expiration, refresh_token, True, g.athlete['id'])
+            flash("connected to strava!")
+        else:
+            flash("there was an issue connecting to strava")
+            print(f"response status code: {r.status_code}")
+
+    else:
+        flash("There was an issue connecting to strava")
     return redirect(url_for('profile.index'))
 
 #function to refresh token
@@ -192,11 +227,12 @@ def hello_world():
     if has_valid_token():
         bearer_token = g.athlete['strava_bearer_token']
         #get the most recent activity and add it to the database 
-        parameters = {'per_page':1, 'page':1}
+        parameters = {'per_page':15, 'page':1}
         header = {'Authorization':'Bearer ' + bearer_token}
         base = 'https://www.strava.com/api/v3/athlete/activities'
-        activity = requests.get(base, headers=header,params=parameters).json()[0]
-        save_activity(activity, g.athlete['id'])
+        activities = requests.get(base, headers=header,params=parameters).json()
+        for activity in activities:
+            save_activity(activity, g.athlete['id'])
         flash("Activity Pulled!")
     else:
         print(g.athlete['connected_to_strava'])
