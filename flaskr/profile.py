@@ -156,8 +156,10 @@ def refresh_existing_token(client_id, client_secret, refresh_token):
         refresh_token = r.json()['refresh_token']
         update_athlete_tokens(bearer_token,token_expiration,refresh_token, True, g.athlete['id'])
         print("token refreshed")
+        return True
     else:
         print(f"Something went wrong. Response: {r.status_code}")
+        return False
 
 #function to check if the user has a valid token
 def has_valid_token():
@@ -181,14 +183,28 @@ def save_activity(activity, athlete_id):
     description = 'sample description'#activity['description']
     distance = activity['distance']
     duration = activity['elapsed_time']
+    strava_id = activity['id']
     #TODO might need to add strava_id or something to activity database so we don't add duplicates
     db = get_db()
-    db.execute(
-        'INSERT INTO activity (start_date, title, description, distance, duration, athlete_id)'
-        ' VALUES (?, ?, ?, ?, ?, ?)',
-        (start, title, description, distance, duration, athlete_id)
-    )
-    db.commit()
+    error = None
+
+    if not activity:
+        error = 'no activity given'
+    elif not strava_id:
+        error = 'no strava activity id given'
+    elif db.execute('SELECT id FROM activity WHERE id = ?', (strava_id,)).fetchone() is not None:
+        error = 'activity ID: {} already exists in the database'.format(strava_id)
+    if error is None:
+        db.execute(
+            'INSERT INTO activity (id, start_date, title, description, distance, duration, athlete_id)'
+            ' VALUES (?, ?, ?, ?, ?, ?, ?)',
+            (strava_id, start, title, description, distance, duration, athlete_id)
+        )
+        db.commit()
+        return True
+    else:
+        flash(error)
+        return False
 
 
 
@@ -215,25 +231,27 @@ def update_athlete_tokens(bearer_token, token_expiration, refresh_token, connect
 @bp.route("/pull_activity/", methods=['POST'])
 def hello_world():
     client_id, client_secret, x, y, z, refresh_token, a = check_prerequisites()
+    valid_token = has_valid_token()
 
     if g.athlete['connected_to_strava'] != 1:
-        print(g.athlete['connected_to_strava'])
         flash("you must be connected to strava")
-        print(g.athlete['connected_to_strava'])
-    elif not has_valid_token():
+    elif not valid_token:
         print("refreshing token")
-        refresh_existing_token(client_id, client_secret, refresh_token)
+        valid_token = refresh_existing_token(client_id, client_secret, refresh_token)
 
-    if has_valid_token():
+    if valid_token:
         bearer_token = g.athlete['strava_bearer_token']
         #get the most recent activity and add it to the database 
         parameters = {'per_page':15, 'page':1}
         header = {'Authorization':'Bearer ' + bearer_token}
         base = 'https://www.strava.com/api/v3/athlete/activities'
         activities = requests.get(base, headers=header,params=parameters).json()
+        added_to_db = False
         for activity in activities:
-            save_activity(activity, g.athlete['id'])
-        flash("Activity Pulled!")
+            added_to_db = added_to_db or save_activity(activity, g.athlete['id'])
+        if added_to_db:
+            flash("Activity Pulled!")
+        
     else:
         print(g.athlete['connected_to_strava'])
         flash("You must be connected to strava")
