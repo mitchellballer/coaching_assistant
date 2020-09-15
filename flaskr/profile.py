@@ -10,6 +10,7 @@ import properties
 import configparser
 import requests
 import time
+from datetime import datetime
 from urllib.parse import urlparse, parse_qs
 
 from requests_oauthlib import OAuth2Session
@@ -172,6 +173,7 @@ def has_valid_token():
         return False
 
 #save given activity to database for given athlete
+#only save activity if it doesn't already exist in the database
 #input is a single activity in json form provided by strava
 def save_activity(activity, athlete_id):
     title = activity['name']
@@ -232,6 +234,7 @@ def update_athlete_tokens(bearer_token, token_expiration, refresh_token, connect
 def hello_world():
     client_id, client_secret, x, y, z, refresh_token, a = check_prerequisites()
     valid_token = has_valid_token()
+    most_recent = most_recent_activity(g.athlete['id'])
 
     if g.athlete['connected_to_strava'] != 1:
         flash("you must be connected to strava")
@@ -242,7 +245,9 @@ def hello_world():
     if valid_token:
         bearer_token = g.athlete['strava_bearer_token']
         #get the most recent activity and add it to the database 
-        parameters = {'per_page':15, 'page':1}
+        parameters = {'per_page':2, 'page':1}
+        if most_recent:
+            parameters['after'] = most_recent
         header = {'Authorization':'Bearer ' + bearer_token}
         base = 'https://www.strava.com/api/v3/athlete/activities'
         activities = requests.get(base, headers=header,params=parameters).json()
@@ -251,6 +256,8 @@ def hello_world():
             added_to_db = added_to_db or save_activity(activity, g.athlete['id'])
         if added_to_db:
             flash("Activity Pulled!")
+        else:
+            flash("No new activities to pull.")
         
     else:
         print(g.athlete['connected_to_strava'])
@@ -283,3 +290,16 @@ def check_prerequisites():
     strava_id = g.athlete['strava_athlete_id']
 
     return client_id, client_secret, athlete_id, bearer_token, token_expiration, refresh_token, strava_id
+
+def most_recent_activity(athlete_id):
+    db = get_db()
+    most_recent = db.execute(
+        'SELECT max(start_date) FROM activity WHERE athlete_id = ?',
+        (athlete_id,)).fetchone()[0]
+    epoch = datetime.strptime(most_recent, "%Y-%m-%d %H:%M:%S").timestamp()
+    print (most_recent)
+    print (epoch)
+    if most_recent:
+        return epoch
+    else:
+        return None
