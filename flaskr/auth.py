@@ -14,6 +14,7 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        coach_or_athlete = request.form['coach_or_athlete']
         db = get_db()
         error = None
 
@@ -21,20 +22,33 @@ def register():
             error = 'Username is required.'
         elif not password:
             error = 'Password is required.'
-        elif db.execute(
-            'SELECT id FROM athlete WHERE username = ?', (username,)
-        ).fetchone() is not None:
-            error = 'User {} is already registered.'.format(username)
-        
-        #add them to the database
-        if error is None:
-            db.execute(
-                'INSERT INTO athlete (username, password, connected_to_strava) VALUES (?, ?, ?)',
-                (username, generate_password_hash(password), False)
-            )
-            db.commit()
+        elif not coach_or_athlete:
+            error = 'radio button needs to be selected?'
+
+        elif coach_or_athlete == 'athlete':
+            if db.execute('SELECT id FROM athlete WHERE username = ?', (username,)).fetchone() is not None:
+                error = 'Athlete {} is already registered.'.format(username)
+            else:
+                db.execute(
+                    'INSERT INTO athlete (username, password, connected_to_strava) VALUES (?, ?, ?)',
+                    (username, generate_password_hash(password), False))
+                db.commit()
+
+        elif coach_or_athlete == 'coach':
+            if db.execute('SELECT id FROM coach WHERE username = ?', (username,)).fetchone() is not None:
+                error = 'Coach {} is already registered.'.format(username)
+            else:
+                db.execute(
+                    'INSERT INTO coach (username, password) VALUES (?, ?)',
+                    (username, generate_password_hash(password)))
+                db.commit()
+
+
+        if error is not None:
+            flash(error)
+            return render_template('auth/register.html')
+        else:
             return redirect(url_for('auth.login'))
-        flash(error)
     return render_template('auth/register.html')
 
 @bp.route('/login', methods=('GET', 'POST'))

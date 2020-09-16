@@ -10,6 +10,11 @@
     <input name="username" id="username" required>
     <label for="password">Password</label>
     <input type="password" name="password" id="password" required>
+    <label for="coach_or_athlete">Coach or Athlete</label>
+    <input type="radio" name="coach_or_athlete" id="coach" value="coach">
+    <label for="coach">Coach</label>
+    <input type="radio" name="coach_or_athlete" id="athlete" value="athlete" checked="checked">
+    <label for="athlete">Athlete</label>
     <input type="submit" value="Register">
   </form>
 {% endblock %}
