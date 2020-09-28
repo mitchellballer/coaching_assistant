@@ -63,7 +63,7 @@ def login():
         ).fetchone()
 
         if athlete is None:
-            error = 'Incorrect Username.'
+            error = 'Incorrect username.'
         elif not check_password_hash(athlete['password'], password):
             error = 'Incorrect password.'
 
