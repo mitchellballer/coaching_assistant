@@ -5,5 +5,5 @@ VALUES
 
 INSERT INTO activity (title, description, athlete_id, start_date)
 VALUES
-    ('test title', 'test' || x'0a' || 'body', 1, '2018-01-01 00:00:00');
+    ('test title', 'test', 1, '2018-01-01 00:00:00');
 
