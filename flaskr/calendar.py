@@ -6,6 +6,7 @@ import datetime
 
 from flaskr.auth import login_required
 from flaskr.db import get_db
+from .utils.strava_utils import print_stuff
 
 bp = Blueprint('calendar', __name__)
 
@@ -18,6 +19,8 @@ def index():
         ' FROM activity p JOIN athlete u ON p.athlete_id = u.id'
         ' ORDER BY start_date DESC'
     ).fetchall()
+    print_stuff.hello_world()
+
     return render_template('calendar/index.html', activities=activities)
 
 #create view. Must be logged in to view

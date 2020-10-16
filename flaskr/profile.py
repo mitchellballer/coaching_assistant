@@ -13,6 +13,8 @@ import time
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs
 
+from .utils.strava_utils import print_stuff, db_utils
+
 from requests_oauthlib import OAuth2Session
 
 bp = Blueprint('profile', __name__)
@@ -20,6 +22,8 @@ bp = Blueprint('profile', __name__)
 @bp.route('/profile')
 @login_required
 def index():
+    print_stuff.hello_world()
+
     return render_template('profile/index.html')
 
 @bp.route('/authorized/')
@@ -172,52 +176,7 @@ def has_valid_token():
     else:
         return False
 
-#save given activity to database for given athlete
-#only save activity if it doesn't already exist in the database
-#input is a single activity in json form provided by strava
-def save_activity(activity, athlete_id):
-    title = activity['name']
-    #TODO fix this so our timestamp/datetimes are compatible 
-    #this is a terrible hack solution
-    #strava gives us datetime in format: 2018-02-20T18:02:13Z
-    #flask at somepoint splits this into two strings by a string separating date from time and we can't have a z at the end...
-    start = activity['start_date'].replace('T', ' ').replace('Z','')
-    description = 'sample description'#activity['description']
-    distance = activity['distance']
-    duration = activity['elapsed_time']
-    strava_id = activity['id']
-    #TODO might need to add strava_id or something to activity database so we don't add duplicates
-    db = get_db()
-    error = None
 
-    if not activity:
-        error = 'no activity given'
-    elif not strava_id:
-        error = 'no strava activity id given'
-    elif db.execute('SELECT id FROM activity WHERE id = ?', (strava_id,)).fetchone() is not None:
-        error = 'activity ID: {} already exists in the database'.format(strava_id)
-    if error is None:
-        db.execute(
-            'INSERT INTO activity (id, start_date, title, description, distance, duration, athlete_id)'
-            ' VALUES (?, ?, ?, ?, ?, ?, ?)',
-            (strava_id, start, title, description, distance, duration, athlete_id)
-        )
-        db.commit()
-        return True
-    else:
-        flash(error)
-        return False
-
-
-
-#function that just prints current info about our athlete, state of tokens etc.
-def print_current_state():
-    print("Printing current state")
-    print(f"Athlete id: {g.athlete['id']}")
-    print(f"strava bearer token: {g.athlete['strava_bearer_token']}")
-    print(f"strava bearer token expiration: {g.athlete['strava_bearer_token_expiration']}")
-    print(f"strava refresh token: {g.athlete['strava_refresh_token']}")
-    print(f"strava athlete id: {g.athlete['strava_athlete_id']}")
 
 
 def update_athlete_tokens(bearer_token, token_expiration, refresh_token, connected, athlete_id):
@@ -235,7 +194,6 @@ def hello_world():
     client_id, client_secret, x, y, z, refresh_token, a = check_prerequisites()
     valid_token = has_valid_token()
     most_recent = most_recent_activity(g.athlete['id'])
-
     if g.athlete['connected_to_strava'] != 1:
         flash("you must be connected to strava")
     elif not valid_token:
@@ -253,7 +211,7 @@ def hello_world():
         activities = requests.get(base, headers=header,params=parameters).json()
         added_to_db = False
         for activity in activities:
-            added_to_db = added_to_db or save_activity(activity, g.athlete['id'])
+            added_to_db = added_to_db or db_utils.save_activity(activity, g.athlete['id'])
         if added_to_db:
             flash("Activity Pulled!")
         else:
@@ -296,10 +254,8 @@ def most_recent_activity(athlete_id):
     most_recent = db.execute(
         'SELECT max(start_date) FROM activity WHERE athlete_id = ?',
         (athlete_id,)).fetchone()[0]
-    epoch = datetime.strptime(most_recent, "%Y-%m-%d %H:%M:%S").timestamp()
-    print (most_recent)
-    print (epoch)
     if most_recent:
+        epoch = datetime.strptime(most_recent, "%Y-%m-%d %H:%M:%S").timestamp()
         return epoch
     else:
         return None
