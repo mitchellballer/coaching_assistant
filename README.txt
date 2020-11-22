@@ -15,6 +15,10 @@ Rebuilding the database:
     -flask init-db
         calls db.py > init_db()
     -flask run
+
+testing the application:
+With server running, in root directory:
+$ pytest
     
 prerequisites:
 -python module 'request'

@@ -7,7 +7,7 @@ import time
 import requests
 
 
-def exchange_token(bearer_token, token_exp, refresh_token):
+def exchange_token():
     print("starting exchange token function")
     token_url = 'https://www.strava.com/oauth/token'
     client_id, secret = strava_utils.check_prerequisites()

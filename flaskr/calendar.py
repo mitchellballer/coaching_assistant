@@ -1,16 +1,16 @@
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for
 )
-from werkzeug.exceptions import abort
 import datetime
 
 from flaskr.auth import login_required
 from flaskr.db import get_db
-from .utils.strava_utils import print_stuff
+from .utils import strava_utils
 
 bp = Blueprint('calendar', __name__)
 
-#get the activities to display on the calendar. Return them with the render template
+
+# get the activities to display on the calendar. Return them with the render template
 @bp.route('/')
 def index():
     db = get_db()
@@ -19,11 +19,12 @@ def index():
         ' FROM activity p JOIN athlete u ON p.athlete_id = u.id'
         ' ORDER BY start_date DESC'
     ).fetchall()
-    print_stuff.hello_world()
+    strava_utils.hello_world()
 
     return render_template('calendar/index.html', activities=activities)
 
-#create view. Must be logged in to view
+
+# create view. Must be logged in to view
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
 def create():
@@ -37,13 +38,13 @@ def create():
 
         if not title:
             error = 'Title is required'
-        #if they don't provide a date, use the current datetime
+        # if they don't provide a date, use the current datetime
         if not start_date:
             start_date = datetime.datetime.now()
-        #if they don't provide distance, mark as zero
+        # if they don't provide distance, mark as zero
         if not distance:
             distance = 0
-        #if they don't provide a duration, mark as zero?
+        # if they don't provide a duration, mark as zero?
         if not duration:
             duration = 0
 

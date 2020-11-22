@@ -1,6 +1,6 @@
 import configparser
 from flaskr.db import get_db
-from flask import flash, g
+from flask import flash
 
 
 # function that just prints current info about our athlete, state of tokens
@@ -25,7 +25,7 @@ def hello_world():
 def save_activity(activity, athlete_id):
     title = activity['name']
     start = activity['start_date'].replace('T', ' ').replace('Z', '')
-    description = 'sample description' #activity['description']
+    description = 'sample description'  # activity['description']
     distance = activity['distance']
     duration = activity['elapsed_time']
     strava_id = activity['id']
@@ -51,6 +51,8 @@ def save_activity(activity, athlete_id):
         flash(error)
         return False
 
+
+# Function to pull client_id and client_secret from config
 def check_prerequisites():
     # load client properties from config.properties
     config = configparser.ConfigParser()

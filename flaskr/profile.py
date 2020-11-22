@@ -5,7 +5,7 @@ from flaskr.auth import login_required
 from flaskr.db import get_db
 from datetime import datetime
 from requests_oauthlib import OAuth2Session
-from .utils import test_utils, token_utils, strava_utils
+from .utils import token_utils, strava_utils
 
 import requests
 import time
@@ -33,7 +33,7 @@ def connect():
     bearer_token = g.athlete['strava_bearer_token']
     token_exp = g.athlete['strava_bearer_token_expiration']
     refresh_token = g.athlete['strava_refresh_token']
-    
+
     # put code to connect to strava here
     print('connecting to strava')
 
@@ -59,7 +59,7 @@ def connect():
 
 @bp.route('/exchange_token', methods=('GET', 'POST'))
 def exchange_token():
-    token_utils.exchange_token(g.athlete['strava_bearer_token'], g.athlete['strava_bearer_token_expiration'],g.athlete['strava_refresh_token'])
+    token_utils.exchange_token()
     return redirect(url_for('profile.index'))
 
 
