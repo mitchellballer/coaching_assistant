@@ -3,6 +3,7 @@
 {% block header %}
     <h1>{% block title %}Activities{% endblock %}</h1>
     {% if g.athlete %}
+        <a class="action" href="{{ url_for('activity.pull') }}">New Strava Pull</a>
         <a class="action" href="{{ url_for('activity.create') }}">New Manual Activity</a>
     {% endif %}
 {% endblock %}

@@ -11,3 +11,7 @@ bp = Blueprint('activity', __name__)
 @bp.route('/create')
 def create():
     return render_template('activity/create.html')
+
+@bp.route('/pull')
+def pull():
+    return render_template('activity/create.html')

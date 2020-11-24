@@ -60,3 +60,13 @@ def create():
             db.commit()
             return redirect(url_for('calendar.index'))
     return render_template('activity/create.html')
+
+
+@bp.route('/pull', methods=('GET', 'POST'))
+@login_required
+def pull():
+    if request.method == 'POST':
+        flash("Pull, Post")
+        return redirect(url_for('calendar.index'))
+
+    return render_template('activity/pull.html')
