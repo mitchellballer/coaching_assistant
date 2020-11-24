@@ -48,7 +48,7 @@ def exchange_token():
 def refresh_existing_token(client_id, secret, refresh_token):
     print("refreshing token")
     token_url = 'https://www.strava.com/oauth/token'
-    payload = {'client_id': client_id, 'secret': secret, 'grant_type': 'refresh_token', 'refresh_token': refresh_token}
+    payload = {'client_id': client_id, 'client_secret': secret, 'grant_type': 'refresh_token', 'refresh_token': refresh_token}
     r = requests.post(token_url, data=payload)
     if r.status_code == 200:
         bearer_token = r.json()['access_token']

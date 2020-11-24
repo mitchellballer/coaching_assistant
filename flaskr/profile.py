@@ -2,10 +2,8 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, url_for
 )
 from flaskr.auth import login_required
-from flaskr.db import get_db
-from datetime import datetime
 from requests_oauthlib import OAuth2Session
-from .utils import token_utils, strava_utils
+from .utils import token_utils, strava_utils, db_utils
 
 import requests
 import time
@@ -67,12 +65,11 @@ def exchange_token():
 def hello_world():
     client_id, secret = strava_utils.check_prerequisites()
     valid_token = token_utils.has_valid_token()
-    most_recent = most_recent_activity(g.athlete['id'])
+    most_recent = db_utils.most_recent_activity(g.athlete['id'])
     refresh_token = g.athlete['strava_refresh_token']
     if g.athlete['connected_to_strava'] != 1:
         flash("you must be connected to strava")
     elif not valid_token:
-        print("refreshing token")
         valid_token = token_utils.refresh_existing_token(client_id, secret, refresh_token)
 
     if valid_token:
@@ -98,13 +95,4 @@ def hello_world():
     return render_template('profile/index.html')
 
 
-def most_recent_activity(athlete_id):
-    db = get_db()
-    most_recent = db.execute(
-        'SELECT max(start_date) FROM activity WHERE athlete_id = ?',
-        (athlete_id,)).fetchone()[0]
-    if most_recent:
-        epoch = datetime.strptime(most_recent, "%Y-%m-%d %H:%M:%S").timestamp()
-        return epoch
-    else:
-        return None
+
