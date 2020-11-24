@@ -6,8 +6,20 @@
 
 {% block content %}
   <form method="post">
-    <label for="title">Title</label>
-    <input name="title" id="title" value="{{ request.form['title'] }}">
+    <label for="range">How much?</label>
+    <br>
+
+    <input type="radio" name="range" id="most_recent" value="most_recent">
+    <label for="most_recent">Most recent</label>
+
+    <input type="radio" name="range" id="today" value="today">
+    <label for="today">All activities today</label>
+
+    <input type="radio" name="range" id="week" value="week">
+    <label for="week">All activities in the past 7 days</label>
+
+    <input type="radio" name="range" id="month" value="month">
+    <label for="month">All activities in the past month</label>
     
     <input type="submit" value="Save">
   </form>

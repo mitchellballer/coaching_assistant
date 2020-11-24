@@ -66,7 +66,8 @@ def create():
 @login_required
 def pull():
     if request.method == 'POST':
-        flash("Pull, Post")
+        pull_range = request.form['range']
+        flash(f"Range: {pull_range}")
         return redirect(url_for('calendar.index'))
 
     return render_template('activity/pull.html')

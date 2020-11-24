@@ -1,5 +1,5 @@
 from flaskr.db import get_db
-import datetime
+from datetime import datetime
 
 
 def most_recent_activity(athlete_id):
