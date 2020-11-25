@@ -73,6 +73,8 @@ def hello_world():
         valid_token = token_utils.refresh_existing_token(client_id, secret, refresh_token)
 
     if valid_token:
+        strava_utils.strava_activities(g.athlete['strava_bearer_token'], g.athlete['id'], 1606275918, 1606239918)
+        """
         bearer_token = g.athlete['strava_bearer_token']
         # get the most recent activity and add it to the database
         parameters = {'per_page': 2, 'page': 1}
@@ -88,6 +90,7 @@ def hello_world():
             flash("Activity Pulled!")
         else:
             flash("No new activities to pull.")
+        """
 
     else:
         print(g.athlete['connected_to_strava'])

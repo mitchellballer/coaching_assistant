@@ -1,6 +1,8 @@
 import configparser
+import requests
 from flaskr.db import get_db
 from flask import flash
+from . import token_utils, db_utils
 
 
 # function that just prints current info about our athlete, state of tokens
@@ -50,6 +52,28 @@ def save_activity(activity, athlete_id):
     else:
         flash(error)
         return False
+
+
+# query strava for athlete's activities between start and end date then save to database
+# Assumes athlete has a valid bearer token TODO: error check valid bearer token
+# Assumes before/after are epoch timestamp TODO: error check before/after
+def strava_activities(bearer_token, athlete_id, before, after):
+    base = 'https://www.strava.com/api/v3/athlete/activities'
+    parameters = {'before': before, 'after': after}
+    header = {'Authorization': 'Bearer ' + bearer_token}
+    client_id, secret = check_prerequisites()
+    response = requests.get(base, headers=header, params=parameters)
+    activities = response.json()
+    if response.status_code == 200:
+        for activity in activities:
+            save_activity(activity, athlete_id)
+        flash(f"{len(activities)} activities pulled.")
+        print(activities)
+
+    else:
+        flash("There was an error pulling activities from strava.")
+        print(f"info on respone: {response.status_code}")
+        print(response)
 
 
 # Function to pull client_id and client_secret from config
