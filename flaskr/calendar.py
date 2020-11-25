@@ -2,6 +2,7 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for
 )
 import datetime
+import time
 
 from flaskr.auth import login_required
 from flaskr.db import get_db
@@ -66,8 +67,29 @@ def create():
 @login_required
 def pull():
     if request.method == 'POST':
+        bearer_token = g.athlete['strava_bearer_token']
+        athlete_id = g.athlete['id']
         pull_range = request.form['range']
+        before = int(time.time())
+        after = int(time.time())
+        max_activities = 30
         flash(f"Range: {pull_range}")
+
+        if pull_range == "most_recent":
+            after = 0
+            max_activities = 1
+            #strava_utils.strava_activities(bearer_token, athlete_id, time.time(), 0, 1)
+        elif pull_range == "today":
+            after = int(time.time() - (60 * 60 * 24))
+            # no one has more than 30 activities in a day.. right?
+        elif pull_range == "week":
+            after = int(time.time() - (60 * 60 * 24 * 7))
+            max_activities = 100
+        elif pull_range == "month":
+            #TODO need a more elegant way of saying the past month/day/week.
+            after = int(time.time() - (60 * 60 * 24 * 7 * 30))
+        strava_utils.strava_activities(bearer_token, athlete_id, before, after, max_activities)
+        
         return redirect(url_for('calendar.index'))
 
     return render_template('activity/pull.html')

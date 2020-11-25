@@ -65,33 +65,16 @@ def exchange_token():
 def hello_world():
     client_id, secret = strava_utils.check_prerequisites()
     valid_token = token_utils.has_valid_token()
-    most_recent = db_utils.most_recent_activity(g.athlete['id'])
     refresh_token = g.athlete['strava_refresh_token']
+    bearer_token = g.athlete['strava_bearer_token']
+    athlete_id = g.athlete['id']
     if g.athlete['connected_to_strava'] != 1:
         flash("you must be connected to strava")
     elif not valid_token:
         valid_token = token_utils.refresh_existing_token(client_id, secret, refresh_token)
 
     if valid_token:
-        strava_utils.strava_activities(g.athlete['strava_bearer_token'], g.athlete['id'], 1606275918, 1606239918)
-        """
-        bearer_token = g.athlete['strava_bearer_token']
-        # get the most recent activity and add it to the database
-        parameters = {'per_page': 2, 'page': 1}
-        if most_recent:
-            parameters['after'] = most_recent
-        header = {'Authorization': 'Bearer ' + bearer_token}
-        base = 'https://www.strava.com/api/v3/athlete/activities'
-        activities = requests.get(base, headers=header, params=parameters).json()
-        added_to_db = False
-        for activity in activities:
-            added_to_db = added_to_db or strava_utils.save_activity(activity, g.athlete['id'])
-        if added_to_db:
-            flash("Activity Pulled!")
-        else:
-            flash("No new activities to pull.")
-        """
-
+        strava_utils.strava_activities(bearer_token, athlete_id, int(time.time()), 0, 4)
     else:
         print(g.athlete['connected_to_strava'])
         flash("You must be connected to strava")

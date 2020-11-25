@@ -57,9 +57,9 @@ def save_activity(activity, athlete_id):
 # query strava for athlete's activities between start and end date then save to database
 # Assumes athlete has a valid bearer token TODO: error check valid bearer token
 # Assumes before/after are epoch timestamp TODO: error check before/after
-def strava_activities(bearer_token, athlete_id, before, after):
+def strava_activities(bearer_token, athlete_id, before, after, max_activities):
     base = 'https://www.strava.com/api/v3/athlete/activities'
-    parameters = {'before': before, 'after': after}
+    parameters = {'before': before, 'after': after, 'per_page': max_activities}
     header = {'Authorization': 'Bearer ' + bearer_token}
     client_id, secret = check_prerequisites()
     response = requests.get(base, headers=header, params=parameters)
@@ -68,7 +68,6 @@ def strava_activities(bearer_token, athlete_id, before, after):
         for activity in activities:
             save_activity(activity, athlete_id)
         flash(f"{len(activities)} activities pulled.")
-        print(activities)
 
     else:
         flash("There was an error pulling activities from strava.")
