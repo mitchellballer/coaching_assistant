@@ -4,25 +4,7 @@
  */
 
 
-/* WRAPPER */
 
-.wrapper {
-    display: grid;
-    grid-template-rows: 70px 1fr 70px;
-    grid-template-columns: 1fr;
-    grid-template-areas: "sidebar"
-                         "content";
-    width: 100vw; /* unnecessary, but let's keep things consistent */
-    height: 100vh;
-  }
-  
-  @media screen and (min-width: 850px) {
-    .wrapper {
-      grid-template-columns: 200px 5fr;
-      grid-template-rows: 1fr;
-      grid-template-areas: "sidebar content";
-    }
-  }
   
   
   
@@ -33,35 +15,9 @@
     padding: 48px;
   }
   
-  sidebar {
-    grid-area: sidebar;
-    display: grid;
-    grid-template-columns: 1fr 3fr 1fr;
-    grid-template-rows: 3fr 1fr;
-    grid-template-areas: "logo menu avatar"
-                         "copyright menu avatar";
-  }
-  .logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+
   .copyright {
     text-align: center;
-  }
-  .avatar {
-    grid-area: avatar;
-    display: flex;
-    align-items: center;
-    flex-direction: row-reverse;
-  }
-  .avatar__name {
-    flex: 1;
-    text-align: right;
-    margin-right: 1em;
-  }
-  .avatar__img > img {
-    display: block;
   }
   
   .copyright {
@@ -80,46 +36,8 @@
     display: none;
   }
   
-  @media screen and (min-width: 850px) {
-    sidebar {
-      grid-template-areas: "logo"
-                           "avatar"
-                           "menu"
-                           "copyright";
-      grid-template-columns: 1fr;
-      grid-template-rows: 50px auto 1fr 50px;
-    }
-    
-    .menu {
-      flex-direction: column;
-      align-items: normal;
-      justify-content: flex-start;
-    }
-    .menu__text {
-      display: inline-block;
-    }
-    .avatar {
-      flex-direction: column;
-    }
-    .avatar__name {
-      margin: 1em 0;
-    }
-    .avatar__img > img {
-      border-radius: 50%;
-    }
-  }
-  
-  
-  
-  
   /* MAIN */
-  
-  .toolbar{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-  }
+
   .calendar{}
   
   .calendar__week,
@@ -141,10 +59,7 @@
   .calendar__day {
     padding: 16px;
   }
-  
-  
-  
-  
+
   /* COSMETIC STYLING */
   
   :root {
@@ -157,17 +72,8 @@
     color: #A8B2B9;
   }
   
-  sidebar {
-    background-color: white;
-    box-shadow: 5px 0px 20px rgba(0, 0, 0, 0.2);
-  }
-  
   main {
     background-color: #FCFBFC;
-  }
-  
-  .avatar__name {
-    font-size: 0.8rem;
   }
   
   .menu__item {
@@ -236,7 +142,6 @@
   .toggle{
     display: grid;
     grid-template-columns: 1fr 1fr;
-  
     text-align: center;
     font-size: 0.9em;
   }
