@@ -20,10 +20,13 @@ def index():
         ' FROM activity p JOIN athlete u ON p.athlete_id = u.id'
         ' ORDER BY start_date DESC'
     ).fetchall()
-    strava_utils.hello_world()
 
     return render_template('calendar/index.html', activities=activities)
 
+
+@bp.route('/days')
+def days():
+    return render_template('calendar/days.html')
 
 # create view. Must be logged in to view
 @bp.route('/create', methods=('GET', 'POST'))
@@ -89,7 +92,7 @@ def pull():
             #TODO need a more elegant way of saying the past month/day/week.
             after = int(time.time() - (60 * 60 * 24 * 7 * 30))
         strava_utils.strava_activities(bearer_token, athlete_id, before, after, max_activities)
-        
+
         return redirect(url_for('calendar.index'))
 
     return render_template('activity/pull.html')
