@@ -24,11 +24,11 @@ class Week:
         self.week = week
         start_day, num_days = calendar.monthrange(year, month)
         self.days = []
+        count = 1
 
         if week == 0:
             for i in range(start_day):
                 self.days.append(Day(year, month, week, 0))
-            count = 1
             for i in range(start_day, 7):
                 self.days.append(Day(year, month, week, count))
                 count += 1
@@ -36,7 +36,9 @@ class Week:
             count = (7 - start_day) + (7 * (week - 1))
             while count < count + 7 and count < num_days:
                 self.days.append(Day(year, month, week, count))
-            while count < count + 7:
+                count += 1
+            #while count < count + 7:
+            for i in range(7-count):
                 self.days.append(Day(year, month, week, 0))
 
 
