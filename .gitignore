@@ -16,3 +16,4 @@ config.properties
 instance/
 .vscode
 .DS_store
+.idea

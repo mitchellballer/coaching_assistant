@@ -7,6 +7,7 @@ import time
 from flaskr.auth import login_required
 from flaskr.db import get_db
 from .utils import strava_utils
+from .utils.my_calendar import Month
 
 bp = Blueprint('calendar', __name__)
 
@@ -26,8 +27,9 @@ def index():
 
 @bp.route('/days')
 def days():
+    month = Month(2020, 12)
     sample = [[0, 0, 1, 2, 3, 4, 5], [6, 7, 8, 9, 10, 11, 12]]
-    return render_template('calendar/days.html', month='December', year='2020',sample=sample)
+    return render_template('calendar/days.html', sample=month)#month='December', year='2020',sample=sample)
 
 # create view. Must be logged in to view
 @bp.route('/create', methods=('GET', 'POST'))
