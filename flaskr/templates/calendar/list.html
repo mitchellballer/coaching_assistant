@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block header %}
+    <h1>{% block title %}Activities{% endblock %}</h1>
+    {% if g.athlete %}
+        <a class="action" href="{{ url_for('activity.pull') }}">New Strava Pull</a>
+        <a class="action" href="{{ url_for('activity.create') }}">New Manual Activity</a>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% for activity in activities %}
+        <article class="activity">
+            <header>
+                <div>
+                    <h1>{{ activity['title'] }}</h1>
+                    <div class="about">by {{ activity['username'] }} on {{ activity['start_date'].strftime('%Y-%m-%d') }}</div>
+                    <div class="about">{{ activity['distance'] }} miles in {{ activity['duration'] }} seconds</div>
+                </div>
+                {% if g.athlete['id'] == activity['athlete_id'] %}
+                    
+                {% endif %}
+            </header>
+            <p class="body">{{ activity['description'] }}</p>
+        </article>
+        {% if not loop.last %}
+            <hr>
+        {% endif %}
+    {% endfor %}
+{% endblock %}

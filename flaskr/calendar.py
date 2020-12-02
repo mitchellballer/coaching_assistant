@@ -13,8 +13,8 @@ bp = Blueprint('calendar', __name__)
 
 
 # get the activities to display on the calendar. Return them with the render template
-@bp.route('/')
-def index():
+@bp.route('/list')
+def list():
     db = get_db()
     activities = db.execute(
         'SELECT p.id, title, description, start_date, athlete_id, username, distance, duration'
@@ -22,14 +22,14 @@ def index():
         ' ORDER BY start_date DESC'
     ).fetchall()
 
-    return render_template('calendar/index.html', activities=activities)
+    return render_template('calendar/list.html', activities=activities)
 
 
-@bp.route('/days')
-def days():
+@bp.route('/')
+def index():
     month = Month(2020, 12)
     sample = [[0, 0, 1, 2, 3, 4, 5], [6, 7, 8, 9, 10, 11, 12]]
-    return render_template('calendar/days.html', sample=month)#month='December', year='2020',sample=sample)
+    return render_template('calendar/index.html', sample=month)#month='December', year='2020',sample=sample)
 
 # create view. Must be logged in to view
 @bp.route('/create', methods=('GET', 'POST'))
@@ -65,7 +65,7 @@ def create():
                 (title, description, start_date, g.athlete['id'], distance, duration)
             )
             db.commit()
-            return redirect(url_for('calendar.index'))
+            return redirect(url_for('calendar.list'))
     return render_template('activity/create.html')
 
 
@@ -96,6 +96,6 @@ def pull():
             after = int(time.time() - (60 * 60 * 24 * 7 * 30))
         strava_utils.strava_activities(bearer_token, athlete_id, before, after, max_activities)
 
-        return redirect(url_for('calendar.index'))
+        return redirect(url_for('calendar.list'))
 
     return render_template('activity/pull.html')
