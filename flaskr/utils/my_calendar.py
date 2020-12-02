@@ -4,11 +4,14 @@ import calendar
 class Month:
     # TODO: look into sqlalchemy for storing these objects in my database without a ton of work
     def __init__(self, year, month):
+        month_names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
+                       'September', 'October', 'November', 'December']
         self.year = year
         self.month = month
         self.start_day, num_days = calendar.monthrange(year, month)
         self.has_activities = False
         self.weeks = []
+        self.month_name = month_names[self.month - 1]
         num_weeks = int(((self.start_day + num_days) / 7) - .001)
         for i in range(num_weeks + 1):
             self.weeks.append(Week(year, month, i))
