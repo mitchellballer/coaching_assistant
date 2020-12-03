@@ -1,4 +1,7 @@
 import calendar
+from datetime import date
+
+from flaskr.db import get_db
 
 
 class Month:
@@ -18,6 +21,29 @@ class Month:
 
     def __str__(self):
         return f"there are {len(self.weeks)} weeks in this month"
+
+    def add_activities(self, athlete_id):
+        """Add activities that are already in the database for this athlete to this Month"""
+        month_start = '2020-11-01'#date.fromisoformat('2020-11-01').ctime()
+        month_end = '2020-11-30'#date.fromisoformat('2020-11-30').ctime()
+        db = get_db()
+        activities = db.execute(
+            'SELECT id, title, description, start_date, distance, duration, athlete_id'
+            ' FROM activity'
+            ' WHERE athlete_id = ? AND start_date BETWEEN ? AND ?',
+            (athlete_id, month_start, month_end,)
+        ).fetchall()
+        print(month_end)
+        for activity in activities:
+            # TODO: this is a hacked solution it's almost comical.
+            # first 10 characters of start_date are YYYY-MM-DD which is what we need for date object
+            self.get_day(activity['start_date'].day).add_activity(activity)
+
+    def get_day(self, day):
+        day += self.start_day
+        week = int((day / 7) - .001)
+        day = (day - 1) % 7
+        return self.weeks[week].days[day]
 
 
 class Week:
@@ -50,3 +76,10 @@ class Day:
         self.month = month
         self.week = week
         self.date = date
+        self.activities = []
+
+    def add_activity(self, activity):
+        self.activities.append(activity)
+
+    def has_activities(self):
+        return len(self.activities) > 0

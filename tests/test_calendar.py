@@ -2,14 +2,14 @@ import pytest
 from flaskr.db import get_db
 import datetime
 
-def test_index(client, auth):
+def test_list(client, auth):
     response = client.get('/')
     assert b"Log In" in response.data
     assert b"Register" in response.data
 
 
     auth.login()
-    response = client.get('/')
+    response = client.get('/list')
     assert b'Log Out' in response.data
     assert b'test title' in response.data
     assert b'by test on 2018-01-01' in response.data

@@ -26,9 +26,11 @@
             {% for day in week.days %}
                 {% if day.date == 0 %}
                 <div class="calendar__day day"></div>
+                {% elif day.has_activities() %}
+                <div class="calendar__day day">{{day.date}} {{day.activities[0].distance}}</div>
                 {% else %}
-                <div class="calendar__day day">{{day.date}}</div>
-                {% endif %}
+                <div class="calendar__day day">{{day.date }}</div>
+            {% endif %}
             {% endfor %}
         </div>
         {% endfor %}

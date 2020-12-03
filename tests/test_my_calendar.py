@@ -33,6 +33,24 @@ def test_month_init(year, month, num_weeks, start_day):
     assert isinstance(test.weeks[0], Week)
     assert isinstance(test.weeks[0].days[0], Day)
 
+@pytest.mark.parametrize(('year', 'month', 'day'), (
+        (2020, 11, 1), (2020, 11, 2), (2020, 11, 30), (2023, 4, 1), (2023, 4, 2),
+        (2023, 4, 3), (2023, 4, 5), (2023, 4, 9),(2023, 4, 24), (2023, 4, 30)
+))
+def test_get_day(year, month, day):
+    test = Month(year, month)
+    assert test.get_day(day).date == day
+
+@pytest.mark.parametrize(('year', 'month', 'athlete_id'), (
+        (2020, 11, 1),
+))
+def test_month_add_activities(auth, year, month, athlete_id):
+    test = Month(year, month)
+    auth.login()
+
+    test.add_activities(athlete_id)
+
+
 
 """
 Frst test the first week of a month that starts on Saturday: November 2020 week 0
