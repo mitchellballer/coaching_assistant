@@ -6,11 +6,11 @@ a calendar with weekly milage, recent workout highlights, comments etc.
 
 export FLASK_APP=__init__.py
 
-Test user: mitchell, password
+source venv/bin/activate
 
 Rebuilding the database:
     -Stop current instance
-    export FLAS_APP=__init__.py
+    export FLAS_APP=flaskr
     export FLASK_ENV=development
     -flask init-db
         calls db.py > init_db()

@@ -14,33 +14,28 @@ def exchange_token():
     print(client_id)
     print(secret)
 
-    if request.method == 'GET':
-        authorization_response = request.url
-        o = urlparse(authorization_response)
-        query = parse_qs(o.query)
-        if 'code' in query:
-            authorization_code = query['code'][0]
-            print(f"authorization code: {authorization_code}")
-        else:
-            print("No authorization code")
-        # perform token exchange
-        payload = {'client_id': client_id, 'client_secret': secret, 'code': authorization_code, 'grant_type': 'authorization_code'}
-        r = requests.post(token_url, data=payload)
-
-        if r.status_code == 200:
-            bearer_token = r.json()['access_token']
-            token_exp = r.json()['expires_at']
-            refresh_token = r.json()['refresh_token']
-            update_athlete_tokens(bearer_token, token_exp, refresh_token, True, g.athlete['id'])
-            flash("connected to strava!")
-        else:
-            flash("there was an issue connecting to strava")
-            print(f"response status code: {r.status_code}")
-            print(f"more info? {r.text}")
-
+    authorization_response = request.url
+    o = urlparse(authorization_response)
+    query = parse_qs(o.query)
+    if 'code' in query:
+        authorization_code = query['code'][0]
+        print(f"authorization code: {authorization_code}")
     else:
-        flash("There was an issue connecting to strava")
-        print(request.data)
+        print("No authorization code")
+    # perform token exchange
+    payload = {'client_id': client_id, 'client_secret': secret, 'code': authorization_code, 'grant_type': 'authorization_code'}
+    r = requests.post(token_url, data=payload)
+
+    if r.status_code == 200:
+        bearer_token = r.json()['access_token']
+        token_exp = r.json()['expires_at']
+        refresh_token = r.json()['refresh_token']
+        update_athlete_tokens(bearer_token, token_exp, refresh_token, True, g.athlete['id'])
+        flash("connected to strava!")
+    else:
+        flash("there was an issue connecting to strava")
+        print(f"response status code: {r.status_code}")
+        print(f"more info? {r.text}")
 
 
 # function to refresh token

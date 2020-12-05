@@ -76,6 +76,7 @@ def pull():
     if request.method == 'POST':
         bearer_token = g.athlete['strava_bearer_token']
         athlete_id = g.athlete['id']
+        refresh_token = g.athlete['strava_refresh_token']
         pull_range = request.form['range']
         before = int(time.time())
         after = int(time.time())
@@ -95,7 +96,7 @@ def pull():
         elif pull_range == "month":
             #TODO need a more elegant way of saying the past month/day/week.
             after = int(time.time() - (60 * 60 * 24 * 7 * 30))
-        strava_utils.strava_activities(bearer_token, athlete_id, before, after, max_activities)
+        strava_utils.strava_activities(bearer_token, athlete_id, before, after, max_activities, refresh_token)
 
         return redirect(url_for('calendar.list'))
 

@@ -14,4 +14,4 @@ def create():
 
 @bp.route('/pull')
 def pull():
-    return render_template('activity/create.html')
+    return render_template('activity/pull.html')

@@ -74,7 +74,7 @@ def hello_world():
         valid_token = token_utils.refresh_existing_token(client_id, secret, refresh_token)
 
     if valid_token:
-        strava_utils.strava_activities(bearer_token, athlete_id, int(time.time()), 0, 4)
+        strava_utils.strava_activities(bearer_token, athlete_id, int(time.time()), 0, 4, refresh_token)
     else:
         print(g.athlete['connected_to_strava'])
         flash("You must be connected to strava")
