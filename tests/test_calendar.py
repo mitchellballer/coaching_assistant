@@ -4,9 +4,7 @@ import datetime
 
 def test_list(client, auth):
     response = client.get('/')
-    assert b"Log In" in response.data
-    assert b"Register" in response.data
-
+    assert b"Redirecting" in response.data
 
     auth.login()
     response = client.get('/list')
@@ -37,4 +35,3 @@ def test_create_validate(client, auth):
     auth.login()
     response = client.post('/create', data={'title': '', 'description': '', 'start_date': datetime.datetime.now(), 'distance': 5, 'duration': 5000})
     assert b'Title is required' in response.data
-    

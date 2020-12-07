@@ -11,11 +11,11 @@ class Month:
                        'September', 'October', 'November', 'December']
         self.year = year
         self.month = month
-        self.start_day, num_days = calendar.monthrange(year, month)
+        self.start_day, self.num_days = calendar.monthrange(year, month)
         self.has_activities = False
         self.weeks = []
         self.month_name = month_names[self.month - 1]
-        num_weeks = int(((self.start_day + num_days) / 7) - .001)
+        num_weeks = int(((self.start_day + self.num_days) / 7) - .001)
         for i in range(num_weeks + 1):
             self.weeks.append(Week(year, month, i))
 
@@ -24,8 +24,8 @@ class Month:
 
     def add_activities(self, athlete_id):
         """Add activities that are already in the database for this athlete to this Month"""
-        month_start = '2020-11-01'#date.fromisoformat('2020-11-01').ctime()
-        month_end = '2020-11-30'#date.fromisoformat('2020-11-30').ctime()
+        month_start = date(self.year, self.month, 1).isoformat()[:10]
+        month_end = date(self.year, self.month, self.num_days).isoformat()[:10]
         db = get_db()
         activities = db.execute(
             'SELECT id, title, description, start_date, distance, duration, athlete_id'
