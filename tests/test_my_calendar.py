@@ -63,11 +63,11 @@ Test the last week of a month that ends on Monday: November 2020 week 5
 Test a random week in the middle of a month: November 2020 week 2
 """
 @pytest.mark.parametrize(('year', 'month', 'week', 'expected_dates'), (
-    (2020, 11, 0, [0, 0, 0, 0, 0, 0, 1]),
+    (2020, 11, 0, [26, 27, 28, 29, 30, 31, 1]),
     (2021, 2, 0, [1, 2, 3, 4, 5, 6, 7]),
-    (2020, 12, 0, [0, 1, 2, 3, 4, 5, 6]),
+    (2020, 12, 0, [30, 1, 2, 3, 4, 5, 6]),
     (2023, 4, 4, [24, 25, 26, 27, 28, 29, 30]),
-    (2020, 11, 5, [30, 0, 0, 0, 0, 0, 0]),
+    (2020, 11, 5, [30, 1, 2, 3, 4, 5, 6]),
     (2020, 11, 2, [9, 10, 11, 12, 13, 14, 15]),
 ))
 def test_week_innit(year, month, week, expected_dates):
@@ -78,3 +78,10 @@ def test_week_innit(year, month, week, expected_dates):
     assert len(test.days) == 7
     for i in range(7):
         assert test.days[i].date == expected_dates[i]
+        if week == 0 and expected_dates[i] > 7:
+            assert test.days[i].last_month
+        elif week > 2 and expected_dates[i] < 7:
+            assert test.days[i].next_month
+        else:
+            assert not test.days[i].next_month
+            assert not test.days[i].last_month
