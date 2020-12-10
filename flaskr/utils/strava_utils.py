@@ -61,6 +61,7 @@ def strava_activities(bearer_token, athlete_id, before, after, max_activities, r
     if not token_utils.has_valid_token():
         client_id, secret = check_prerequisites()
         token_utils.refresh_existing_token(client_id, secret, refresh_token)
+        bearer_token = token_utils.get_bearer_token(athlete_id)
     base = 'https://www.strava.com/api/v3/athlete/activities'
     parameters = {'before': before, 'after': after, 'per_page': max_activities}
     header = {'Authorization': 'Bearer ' + bearer_token}

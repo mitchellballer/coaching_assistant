@@ -15,6 +15,7 @@ def exchange_token():
     print(secret)
 
     authorization_response = request.url
+    print(request.url)
     o = urlparse(authorization_response)
     query = parse_qs(o.query)
     if 'code' in query:
@@ -77,3 +78,15 @@ def update_athlete_tokens(bearer_token, token_exp, refresh_token, connected, ath
         (bearer_token, token_exp, refresh_token, connected, athlete_id)
     )
     db.commit()
+
+
+def get_bearer_token(athlete_id):
+    db = get_db()
+    token = db.execute(
+        'SELECT strava_bearer_token FROM athlete WHERE id = ?',
+        (athlete_id,)).fetchone()[0]
+    if token:
+        return token
+    else:
+        # TODO: error message here?
+        return None
