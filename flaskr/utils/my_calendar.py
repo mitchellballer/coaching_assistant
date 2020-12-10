@@ -90,3 +90,7 @@ class Day:
 
     def has_activities(self):
         return len(self.activities) > 0
+
+    def miles(self):
+        """return today's first activity in miles"""
+        return round(self.activities[0]['distance'] / 1609.344,2)

@@ -139,6 +139,11 @@
     border-right: 0;
   }
   
+  .distance {
+    font-weight: bolder;
+    color: blue;
+  }
+
   .toggle{
     display: grid;
     grid-template-columns: 1fr 1fr;
