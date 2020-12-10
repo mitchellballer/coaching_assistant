@@ -1,5 +1,13 @@
 {% extends 'base.html' %}
 
+{% block header %}
+    <h1>{% block title %}Activities{% endblock %}</h1>
+        {% if g.athlete %}
+            <a class="action" href="{{ url_for('activity.pull') }}">New Strava Pull</a>
+            <a class="action" href="{{ url_for('activity.create') }}">New Manual Activity</a>
+    {% endif %}
+{% endblock %}
+
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='days.css') }}">
 <div class="">
@@ -9,7 +17,7 @@
           <div class="toggle__option">week</div>
           <div class="toggle__option toggle__option--selected">month</div>
         </div>
-        <div class="current-month">{{sample.month_name}} {{sample.year}}</div>
+        <div class="current-month">{{month.month_name}} {{month.year}}</div>
       </div>
       <div class="calendar">
         <div class="calendar__header">
@@ -21,7 +29,7 @@
           <div>sat</div>
           <div>sun</div>
         </div>
-        {% for week in sample.weeks %}
+        {% for week in month.weeks %}
         <div class="calendar__week">
             {% for day in week.days %}
                 {% if day.date == 0 %}

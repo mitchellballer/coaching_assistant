@@ -30,7 +30,7 @@ def list():
 def index():
     month = Month(datetime.datetime.now().year, datetime.datetime.now().month)
     month.add_activities(g.athlete['id'])
-    return render_template('calendar/index.html', sample=month)#month='December', year='2020',sample=sample)
+    return render_template('calendar/index.html', month=month)
 
 # create view. Must be logged in to view
 @bp.route('/create', methods=('GET', 'POST'))
