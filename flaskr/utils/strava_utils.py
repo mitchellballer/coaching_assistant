@@ -26,7 +26,7 @@ def hello_world():
 # TODO: reevaluate how activity start time is stored. Epoch? String? datetime?
 def save_activity(activity, athlete_id):
     title = activity['name']
-    start = activity['start_date'].replace('T', ' ').replace('Z', '')
+    start = activity['start_date_local'].replace('T', ' ').replace('Z', '')
     description = 'sample description'  # activity['description']
     distance = activity['distance']
     duration = activity['elapsed_time']
