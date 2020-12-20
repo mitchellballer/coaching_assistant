@@ -25,6 +25,9 @@ class Month:
     # TODO: this functionality should be on the week level. Month.add_activities should tell it's week objects to add_activities
     def add_activities(self, athlete_id):
         """Add activities that are already in the database for this athlete to this Month"""
+        for week in self.weeks:
+            week.add_activities(athlete_id)
+        """
         month_start = date(self.year, self.month, 1).isoformat()[:10]
         month_end = date(self.year, self.month, self.num_days).isoformat()[:10]
         db = get_db()
@@ -39,6 +42,7 @@ class Month:
             # TODO: this is a hacked solution it's almost comical.
             # first 10 characters of start_date are YYYY-MM-DD which is what we need for date object
             self.get_day(activity['start_date'].day).add_activity(activity)
+        """
 
     def get_day(self, day):
         day += self.start_day
@@ -51,28 +55,59 @@ class Week:
     def __init__(self, year, month, week):
         self.year = year
         self.month = month
+        #this is the number week of the month
         self.week = week
-        start_day, num_days = calendar.monthrange(year, month)
+        self.start_day, num_days = calendar.monthrange(year, month)
         self.days = []
         date_count = 1
         next_month_date = 1
-        prev_month_date = (date(self.year, self.month, 1) - timedelta(days=start_day)).day
+        prev_month_date = (date(self.year, self.month, 1) - timedelta(days=self.start_day)).day
 
         if week == 0:
-            for i in range(start_day):
+            for i in range(self.start_day):
                 self.days.append(Day(year, month, week, prev_month_date, True, False))
                 prev_month_date += 1
-            for i in range(start_day, 7):
+            for i in range(self.start_day, 7):
                 self.days.append(Day(year, month, week, date_count, False, False))
                 date_count += 1
         else:
-            date_count = (8 - start_day) + (7 * (week - 1))
+            date_count = (8 - self.start_day) + (7 * (week - 1))
             while len(self.days) < 7 and date_count <= num_days:
                 self.days.append(Day(year, month, week, date_count, False, False))
                 date_count += 1
             while len(self.days) < 7:
                 self.days.append(Day(year, month, week, next_month_date, False, True))
                 next_month_date += 1
+
+    def add_activities(self, athlete_id):
+        if self.days[0].last_month:
+            week_start = (date(self.year, self.month, 1) - timedelta(days=self.start_day)).isoformat()[:10]
+        else:
+            week_start = date(self.year, self.month, self.days[0].date).isoformat()[:10]
+
+        if self.days[-1].next_month:
+            # the end of the week is the first day of the week plus 7 days (we want the very beginning of the next week for our range)
+            week_end = (date(self.year, self.month, self.days[0].date) + timedelta(days=7)).isoformat()[:10]
+
+        else:
+            week_end = date(self.year, self.month, self.days[-1].date).isoformat()[:10]
+
+        db = get_db()
+        activities = db.execute(
+            'SELECT id, title, description, start_date, distance, duration, athlete_id'
+            ' FROM activity'
+            ' WHERE athlete_id = ? AND start_date BETWEEN ? AND ?',
+            (athlete_id, week_start, week_end,)
+        ).fetchall()
+        for activity in activities:
+            # TODO: this is a hacked solution it's almost comical.
+            # first 10 characters of start_date are YYYY-MM-DD which is what we need for date object
+            self.get_day(activity['start_date'].day).add_activity(activity)
+
+    def get_day(self, day):
+        """retrieve Day object who has given date"""
+        day += self.start_day
+        return self.days[(day - 1) % 7]
 
 
 class Day:
