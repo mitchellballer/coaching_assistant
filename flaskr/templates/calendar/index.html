@@ -14,36 +14,10 @@
     <main>
       <div class="toolbar">
         <div class="toggle">
-          <div class="toggle__option">week</div>
+          <div class="toggle__option toggle__option--selected">week</div>
           <div class="toggle__option toggle__option--selected">month</div>
         </div>
         <div class="current-month">{{month.month_name}} {{month.year}}</div>
-      </div>
-      <div class="calendar">
-        <div class="calendar__header">
-          <div>mon</div>
-          <div>tue</div>
-          <div>wed</div>
-          <div>thu</div>
-          <div>fri</div>
-          <div>sat</div>
-          <div>sun</div>
-        </div>
-        {% for week in month.weeks %}
-        <div class="calendar__week">
-            {% for day in week.days %}
-                {% if day.date == 0 %}
-                <div class="calendar__day day"></div>
-                {% elif day.has_activities() %}
-                <div class="calendar__day day">{{day.date}}
-                    <div class="distance">{{day.miles()}}</div>
-                </div>
-                {% else %}
-                <div class="calendar__day day">{{day.date }}</div>
-            {% endif %}
-            {% endfor %}
-        </div>
-        {% endfor %}
       </div>
     </main>
   </div>

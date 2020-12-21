@@ -7,7 +7,7 @@ import time
 from flaskr.auth import login_required
 from flaskr.db import get_db
 from .utils import strava_utils
-from .utils.my_calendar import Month
+from .utils.my_calendar import Month, Week
 
 bp = Blueprint('calendar', __name__)
 
@@ -30,7 +30,21 @@ def list():
 def index():
     month = Month(datetime.datetime.now().year, datetime.datetime.now().month)
     month.add_activities(g.athlete['id'])
-    return render_template('calendar/index.html', month=month)
+    return render_template('calendar/month.html', month=month)
+
+@bp.route('/month')
+@login_required
+def month():
+    month = Month(datetime.datetime.now().year, datetime.datetime.now().month)
+    return render_template('calendar/month.html', month=month)
+
+@bp.route('/week')
+@login_required
+def week():
+    month = Month(datetime.datetime.now().year, datetime.datetime.now().month)
+    week = month.weeks[0]
+    week.add_activities(g.athlete['id'])
+    return render_template('calendar/week.html', week=week, month=month)
 
 # create view. Must be logged in to view
 @bp.route('/create', methods=('GET', 'POST'))
