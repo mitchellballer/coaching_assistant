@@ -36,6 +36,7 @@ def index():
 @login_required
 def month():
     month = Month(datetime.datetime.now().year, datetime.datetime.now().month)
+    month.add_activities(g.athlete['id'])
     return render_template('calendar/month.html', month=month)
 
 @bp.route('/week')

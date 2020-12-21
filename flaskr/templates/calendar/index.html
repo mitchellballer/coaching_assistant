@@ -14,8 +14,20 @@
     <main>
       <div class="toolbar">
         <div class="toggle">
-          <div class="toggle__option toggle__option--selected">week</div>
-          <div class="toggle__option toggle__option--selected">month</div>
+          <a class="action" href="{{ url_for('calendar.week') }}">
+            {% if week %}
+            <div class="toggle__option toggle__option--selected">week</div>
+            {% else %}
+            <div class="toggle__option">week</div>
+            {% endif %}
+          </a>
+          <a href="{{ url_for('calendar.month') }}">
+            {% if week %}
+            <div class="toggle__option">month</div>
+            {% else %}
+            <div class="toggle__option toggle__option--selected">month</div>
+            {% endif %}
+          </a>
         </div>
         <div class="current-month">{{month.month_name}} {{month.year}}</div>
       </div>
