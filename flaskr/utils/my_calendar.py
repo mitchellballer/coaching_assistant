@@ -90,7 +90,7 @@ class Week:
             week_end = (date(self.year, self.month, self.days[0].date) + timedelta(days=7)).isoformat()[:10]
 
         else:
-            week_end = date(self.year, self.month, self.days[-1].date).isoformat()[:10]
+            week_end = (date(self.year, self.month, self.days[-1].date) + timedelta(days=1)).isoformat()[:10]
 
         db = get_db()
         activities = db.execute(

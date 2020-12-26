@@ -28,20 +28,19 @@ def list():
 @bp.route('/')
 @login_required
 def index():
-    month = Month(datetime.datetime.now().year, datetime.datetime.now().month)
-    month.add_activities(g.athlete['id'])
-    return render_template('calendar/month.html', month=month)
+    return redirect(url_for('calendar.month', year=datetime.datetime.now().year, month=datetime.datetime.now().month))
 
-@bp.route('/month')
-@login_required
-def month():
-    month = Month(datetime.datetime.now().year, datetime.datetime.now().month)
-    month.add_activities(g.athlete['id'])
-    return render_template('calendar/month.html', month=month)
 
-@bp.route('/week')
+@bp.route('/month/<int:year>/<int:month>')
 @login_required
-def week():
+def month(year, month):
+    new_month = Month(year, month)
+    new_month.add_activities(g.athlete['id'])
+    return render_template('calendar/month.html', month=new_month)
+
+@bp.route('/week/<int:year>/<int:month>/<int:week>')
+@login_required
+def week(year, month, week):
     month = Month(datetime.datetime.now().year, datetime.datetime.now().month)
     week = month.weeks[0]
     week.add_activities(g.athlete['id'])
