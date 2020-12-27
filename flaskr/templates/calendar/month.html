@@ -2,6 +2,8 @@
 
 {% block content %}
 {{ super() }}
+<a class="action" href="{{ url_for('calendar.month', year=month.prev_month()[0], month=month.prev_month()[1]) }}">Previous</a>
+<a class="action" href="{{ url_for('calendar.month', year=month.next_month()[0], month=month.next_month()[1]) }}">Next</a>
 <div class="calendar">
         <div class="calendar__header">
           <div>mon</div>

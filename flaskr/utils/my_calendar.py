@@ -63,6 +63,16 @@ class Month:
         week = int((day / 7) - .001)
         return week
 
+    def prev_month(self):
+        """return tuple containing year and month of the previous month"""
+        curr = datetime(self.year, self.month, 1) - timedelta(days=1)
+        return [curr.year, curr.month]
+
+    def next_month(self):
+        """return tuple containing year and month of the next month"""
+        curr = datetime(self.year, self.month, 28) + timedelta(days=5)
+        return [curr.year, curr.month]
+
 
 class Week:
     def __init__(self, year, month, week):

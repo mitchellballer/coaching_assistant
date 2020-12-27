@@ -50,6 +50,22 @@ def test_month_add_activities(auth, year, month, athlete_id):
 
     test.add_activities(athlete_id)
 
+@pytest.mark.parametrize(('year', 'month', 'expected'), (
+    (2020, 12, [2020, 11]),
+    (2020, 1, [2019, 12]),
+))
+def test_month_prev_month(year, month, expected):
+    test = Month(year, month)
+    assert expected == test.prev_month()
+
+@pytest.mark.parametrize(('year', 'month', 'expected'), (
+    (2020, 12, [2021, 1]),
+    (2020, 1, [2020, 2]),
+    (2020, 2, [2020, 3])
+))
+def test_month_next_month(year, month, expected):
+    test = Month(year, month)
+    assert expected == test.next_month()
 
 
 """
