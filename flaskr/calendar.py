@@ -42,7 +42,7 @@ def month(year, month):
 @login_required
 def week(year, month, week):
     month = Month(datetime.datetime.now().year, datetime.datetime.now().month)
-    week = month.weeks[0]
+    week = month.get_week_from_day(datetime.datetime.now().day)
     week.add_activities(g.athlete['id'])
     return render_template('calendar/week.html', week=week, month=month)
 

@@ -45,10 +45,17 @@ class Month:
         """
 
     def get_day(self, day):
+        """retrieve day object from date of month"""
         day += self.start_day
         week = int((day / 7) - .001)
         day = (day - 1) % 7
         return self.weeks[week].days[day]
+
+    def get_week_from_day(self, day):
+        """retrieve week object of month that contains given day of month. """
+        day += self.start_day
+        week = int((day / 7) - .001)
+        return self.weeks[week]
 
 
 class Week:
