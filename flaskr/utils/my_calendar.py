@@ -1,5 +1,5 @@
 import calendar
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 
 from flaskr.db import get_db
 
@@ -56,6 +56,12 @@ class Month:
         day += self.start_day
         week = int((day / 7) - .001)
         return self.weeks[week]
+
+    def get_curr_week(self):
+        """retrieve week number of current week"""
+        day = datetime.now().day + self.start_day
+        week = int((day / 7) - .001)
+        return week
 
 
 class Week:
