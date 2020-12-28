@@ -2,6 +2,8 @@
 
 {% block content %}
 {{ super() }}
+<a class="action" href="{{ url_for('calendar.week', year=week.prev_week()[0], month=week.prev_week()[1], week=week.prev_week()[2]) }}">Previous</a>
+<a class="action" href="{{ url_for('calendar.week', year=week.next_week()[0], month=week.next_week()[1], week=week.next_week()[2]) }}">Next</a>
 <div class="calendar">
         <div class="calendar__header">
           <div>mon</div>
