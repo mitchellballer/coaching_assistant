@@ -101,3 +101,28 @@ def test_week_innit(year, month, week, expected_dates):
         else:
             assert not test.days[i].next_month
             assert not test.days[i].last_month
+
+@pytest.mark.parametrize(('year', 'month', 'week', 'expected', 'alternate'), (
+    (2020, 12, 0, [2020, 11, 4], [2020, 11, 4]),
+    (2020, 12, 1, [2020, 11, 5], [2020, 12, 0]),
+    (2020, 1, 1, [2019, 12, 5], [2020, 1, 0]),
+    (2020, 1, 0, [2019, 12, 5], [2019, 12, 4]),
+    (2020, 2, 1, [2020, 1, 4], [2020, 2, 0]),
+    (2020, 2, 2, [2020, 2, 1], [2020, 2, 1]),
+    (2020, 2, 3, [2020, 2, 2], [2020, 2, 2]),
+    (2020, 2, 4, [2020, 2, 3], [2020, 2, 3]),
+))
+def test_week_prev_week(year, month, week, expected, alternate):
+    test = Week(year, month, week)
+    assert expected == test.prev_week() or alternate == test.prev_week()
+
+@pytest.mark.parametrize(('year', 'month', 'week', 'expected', 'alternate'), (
+    (2020, 12, 0, [2020, 12, 1], [2020, 12, 1]),
+    (2020, 12, 1, [2020, 12, 2], [2020, 12, 2]),
+    (2020, 1, 1, [2020, 1, 2], [2020, 1, 2]),
+    (2020, 2, 4, [2020, 3, 0], [2020, 3, 0]),
+    (2020, 12, 4, [2021, 1, 0], [2021, 1, 0])
+))
+def test_week_next_week(year, month, week, expected, alternate):
+    test = Week(year, month, week)
+    assert expected == test.next_week() or alternate == test.next_week()

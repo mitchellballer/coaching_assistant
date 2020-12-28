@@ -132,6 +132,48 @@ class Week:
         day += self.start_day
         return self.days[(day - 1) % 7]
 
+    # TODO: make this more elegant. Seems like a terrible solution
+    def prev_week(self):
+        """return tuple (year, month, week) of the previous week"""
+        new_month = self.month
+        new_year = self.year
+        if self.month == 1:
+            new_year = self.year - 1
+            new_month = 13
+        else:
+            new_year = self.year
+
+        if self.week > 0:
+            return [self.year, self.month, self.week-1]
+        else:
+            new_month = new_month - 1
+            new_month_start, new_month_len = calendar.monthrange(new_year, new_month)
+            new_week = int(((new_month_start + new_month_len) / 7) - .001) - 1
+            return [new_year, new_month, new_week]
+        """ fancy datetime, timedelta logic is too complicated due to some days in a week given week not belonging to same month
+        #make datetime object of the start of this week
+        curr = datetime(self.year, self.month, self.days[6].date)
+        prev = curr - timedelta(days=7)
+        prev_start = calendar.monthrange(prev.year, prev.month)[0]
+        week_num = int(((prev.day + prev_start) / 7) - .001)
+        return [prev.year, prev.month, week_num]
+        """
+
+    def next_week(self):
+        """return tuple (year, month, week) of the next week"""
+        new_month = self.month
+        new_week = self.week + 1
+        new_year = self.year
+        # if the end of this week is in the next month
+        if self.days[-1].next_month and self.month == 12:
+            new_week = 0
+            new_month = 1
+            new_year = self.year + 1 
+        elif self.days[-1].next_month:
+            new_week = 0
+            new_month += 1
+        
+        return [new_year, new_month, new_week]
 
 class Day:
     def __init__(self, year, month, week, date, last_month, next_month):

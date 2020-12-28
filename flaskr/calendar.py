@@ -41,7 +41,7 @@ def month(year, month):
 @bp.route('/week/<int:year>/<int:month>/<int:week>')
 @login_required
 def week(year, month, week):
-    month = Month(datetime.datetime.now().year, datetime.datetime.now().month)
+    month = Month(year, month)
     # week is valid so set it to that.
     if week < len(month.weeks):
         week = month.weeks[week]
