@@ -60,7 +60,10 @@ def create():
     if request.method == 'POST':
         title = request.form['title']
         description = request.form['description']
-        start_date = request.form['start_date']
+        start_date = datetime.datetime.now()# = request.form['start_date']
+        start_date_month = int(request.form['start_date_month'])
+        start_date_year = request.form['start_date_year']
+        start_date_day = int(request.form['start_date_day'])
         distance = request.form['distance']
         duration = request.form['duration']
         error = None
@@ -70,6 +73,12 @@ def create():
         # if they don't provide a date, use the current datetime
         if not start_date:
             start_date = datetime.datetime.now()
+
+        if start_date_year.isdigit() and int(start_date_year) > 1960:
+            start_date_year = int(start_date_year)
+        else:
+            error = "year must be an integer year"
+
         # if they don't provide distance, mark as zero
         if not distance:
             distance = 0
@@ -80,11 +89,13 @@ def create():
         if error is not None:
             flash(error)
         else:
+            user_date = datetime.datetime(start_date_year, start_date_month, start_date_day)
+            print(user_date)
             db = get_db()
             db.execute(
                 'INSERT INTO activity (title, description, start_date, athlete_id, distance, duration)'
                 ' VALUES (?, ?, ?, ?, ?, ?)',
-                (title, description, start_date, g.athlete['id'], distance, duration)
+                (title, description, user_date, g.athlete['id'], distance, duration)
             )
             db.commit()
             return redirect(url_for('calendar.list'))
