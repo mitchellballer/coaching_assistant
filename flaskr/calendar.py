@@ -60,7 +60,6 @@ def create():
     if request.method == 'POST':
         title = request.form['title']
         description = request.form['description']
-        start_date = datetime.datetime.now()# = request.form['start_date']
         start_date_month = int(request.form['start_date_month'])
         start_date_year = request.form['start_date_year']
         start_date_day = int(request.form['start_date_day'])
@@ -70,15 +69,22 @@ def create():
 
         if not title:
             error = 'Title is required'
-        # if they don't provide a date, use the current datetime
-        if not start_date:
-            start_date = datetime.datetime.now()
 
+        #is a valid year
         if start_date_year.isdigit() and int(start_date_year) > 1960:
             start_date_year = int(start_date_year)
         else:
             error = "year must be an integer year"
 
+        # All date inputs result in a valid date
+        try:
+            user_date = datetime.datetime(start_date_year, start_date_month, start_date_day)
+        except ValueError:
+            error = "Invalid date! year: %s, month: %s, day: %s" % (start_date_year, start_date_month, start_date_day)
+        
+        if not distance.isdigit():
+            error = "Invalid distance: %s" % distance
+        
         # if they don't provide distance, mark as zero
         if not distance:
             distance = 0
@@ -89,8 +95,6 @@ def create():
         if error is not None:
             flash(error)
         else:
-            user_date = datetime.datetime(start_date_year, start_date_month, start_date_day)
-            print(user_date)
             db = get_db()
             db.execute(
                 'INSERT INTO activity (title, description, start_date, athlete_id, distance, duration)'
@@ -99,7 +103,9 @@ def create():
             )
             db.commit()
             return redirect(url_for('calendar.list'))
-    return render_template('activity/create.html')
+    months = [['January', 1], ['February', 2], ['March', 3]]
+    curr = datetime.datetime.now()
+    return render_template('activity/create.html', months=months, curr=curr)
 
 
 @bp.route('/pull', methods=('GET', 'POST'))
