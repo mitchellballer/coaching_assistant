@@ -113,7 +113,7 @@ def create():
             if '.' in duration[0]:
                 microsecond = duration[0].split(".")[1]
         else:
-            error = "Incorrect duration format"
+            error = "Invalid duration format"
         
         try:
             formatted_duration = datetime.time(hour=int(hour), minute=int(minute), second=int(second), microsecond=int(microsecond))

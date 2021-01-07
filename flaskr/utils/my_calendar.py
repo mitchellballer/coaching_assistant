@@ -193,4 +193,4 @@ class Day:
 
     def miles(self):
         """return today's first activity in miles"""
-        return round(self.activities[0]['distance'] / 1609.344,2)
+        return round(self.activities[0]['distance'] / 1609.344,1)
