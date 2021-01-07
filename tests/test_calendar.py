@@ -24,7 +24,7 @@ def test_create(client, auth, app):
     response = auth.login()
     assert response.headers['Location'] == 'http://localhost/'
     assert client.get('/create').status_code == 200
-    response = client.post('/create', data={'title': 'created', 'description': '', 'start_date': datetime.datetime.now(), 'distance': 5, 'duration': 5000})
+    response = client.post('/create', data={'title': 'created', 'description': '', 'start_date_year': 2020, 'start_date_month': 1, 'start_date_day': 10, 'distance': 5, 'duration': "50:00"})
 
     with app.app_context():
         db = get_db()
@@ -33,5 +33,17 @@ def test_create(client, auth, app):
 
 def test_create_validate(client, auth):
     auth.login()
-    response = client.post('/create', data={'title': '', 'description': '', 'start_date': datetime.datetime.now(), 'distance': 5, 'duration': 5000})
+    response = client.post('/create', data={'title': '', 'description': '', 'start_date_year': 2020, 'start_date_month': 1, 'start_date_day': 10, 'distance': 5, 'duration': "50:00"})
     assert b'Title is required' in response.data
+
+
+"""
+@pytest.mark.parametrize(('duration', 'title'), (
+    ('01:10', 'Hello World'),
+))
+def test_create_duration(client, auth, app, duration, title):
+    response = auth.login()
+    assert response.headers['Location'] == 'http://localhost/'
+    assert client.get('/create').status_code == 200
+    response = client.post('/create', data={'title': title, 'description': '', 'start_date': datetime.da})
+"""

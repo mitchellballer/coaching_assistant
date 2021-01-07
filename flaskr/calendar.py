@@ -64,7 +64,7 @@ def create():
         start_date_year = request.form['start_date_year']
         start_date_day = int(request.form['start_date_day'])
         distance = request.form['distance']
-        duration = request.form['duration']
+        duration = request.form['duration'].split(":")
         error = None
 
         if not title:
@@ -88,18 +88,47 @@ def create():
         # if they don't provide distance, mark as zero
         if not distance:
             distance = 0
+
+        hour = 0
+        minute = 0
+        second = 0
+        microsecond = 0
         # if they don't provide a duration, mark as zero?
         if not duration:
             duration = 0
+        # they gave hours, minutes and seconds
+        elif len(duration) == 3:
+            hour = duration[0]
+            minute = duration[1]
+            second = duration[2].split(".")[0]
+            if '.' in duration[2]:
+                microsecond = duration[2].split(".")[1]
+        elif len(distance) == 2:
+            minute = duration[0]
+            second = duration[1].split(".")[0]
+            if '.' in duration[1]:
+                microsecond = duration[1].split(".")[1]
+        elif len(distance) == 1:
+            second = duration[0].split(".")[0]
+            if '.' in duration[0]:
+                microsecond = duration[0].split(".")[1]
+        else:
+            error = "Incorrect duration format"
+        
+        try:
+            formatted_duration = datetime.time(hour=int(hour), minute=int(minute), second=int(second), microsecond=int(microsecond))
+        except ValueError:
+            error = "Invalid duration format"
 
         if error is not None:
             flash(error)
         else:
+            duration_seconds = (formatted_duration.hour * 3600) + (formatted_duration.minute * 60) + formatted_duration.second + formatted_duration.microsecond
             db = get_db()
             db.execute(
                 'INSERT INTO activity (title, description, start_date, athlete_id, distance, duration)'
                 ' VALUES (?, ?, ?, ?, ?, ?)',
-                (title, description, user_date, g.athlete['id'], distance, duration)
+                (title, description, user_date, g.athlete['id'], distance, duration_seconds)
             )
             db.commit()
             return redirect(url_for('calendar.list'))
