@@ -41,6 +41,20 @@ def test_create_validate(client, auth):
 @pytest.mark.parametrize(('duration', 'title', 'success'), (
     ('01:10', 'Hello World', True),
     ('99:99', 'Hello World', False),
+    ('1:10:10', 'Second', True),
+    ('01:00:00', '6 digits', True),
+    ('23:59:59.99', 'max', True),
+    ('59:59.99', '4 digit max', True),
+    ('59.99', '2 digit max', True),
+    ('00:00:00.00', 'min', True),
+    ('00:00.00', '4 digit min', True),
+    ('00.00', '2 digit min', True),
+    ('0.1', 'decimal', True),
+    ('25:00:00', 'too many hours', False),
+    ('00:61:00', 'too many minutes', False),
+    ('00:00:61', 'too many seconds', False),
+    ('1010', 'missing colon', False),
+    ('asdf', 'wont work', False),
 ))
 def test_create_duration(client, auth, app, duration, title, success):
     response = auth.login()
